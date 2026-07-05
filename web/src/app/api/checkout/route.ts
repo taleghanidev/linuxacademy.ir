@@ -4,6 +4,7 @@ import { evaluateCoupon } from "@/config/coupons";
 import { getPackage, getTier } from "@/config/products";
 import { db, orderItems, orders } from "@/db";
 import { siteUrl, upsertCustomer } from "@/lib/checkout";
+import { allowRequest, checkoutLimiter } from "@/lib/ratelimit";
 import { zarinpalRequest } from "@/lib/zarinpal";
 
 const itemSchema = z.object({
@@ -66,6 +67,13 @@ function priceLine(item: z.infer<typeof itemSchema>): PricedLine | { error: stri
 }
 
 export async function POST(request: Request) {
+  if (!(await allowRequest(checkoutLimiter, request))) {
+    return Response.json(
+      { error: "Too many requests. Please wait a moment and try again." },
+      { status: 429 },
+    );
+  }
+
   let body: unknown;
   try {
     body = await request.json();
