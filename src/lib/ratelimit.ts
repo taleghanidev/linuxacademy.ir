@@ -26,10 +26,7 @@ function clientIp(request: Request): string {
 }
 
 // Returns true if the request is allowed, false if it should be rejected (429).
-export async function allowRequest(
-  limiter: Ratelimit | null,
-  request: Request,
-): Promise<boolean> {
+export async function allowRequest(limiter: Ratelimit | null, request: Request): Promise<boolean> {
   if (!limiter) return true;
   try {
     const { success } = await limiter.limit(clientIp(request));

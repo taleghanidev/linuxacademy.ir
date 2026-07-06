@@ -21,7 +21,10 @@ export async function GET(request: Request) {
 
   // Already settled — don't double-process.
   if (order.status === "PAID") {
-    return Response.redirect(`${base}/order/thank-you?ref=${order.refId ?? ""}`, 302);
+    return Response.redirect(
+      `${base}/order/thank-you?ref=${order.refId ?? ""}&order=${order.id}`,
+      302,
+    );
   }
 
   if (status !== "OK") {
@@ -46,5 +49,8 @@ export async function GET(request: Request) {
     .set({ status: "PAID", refId: result.refId, updatedAt: new Date() })
     .where(eq(orders.id, order.id));
 
-  return Response.redirect(`${base}/order/thank-you?ref=${result.refId ?? ""}`, 302);
+  return Response.redirect(
+    `${base}/order/thank-you?ref=${result.refId ?? ""}&order=${order.id}`,
+    302,
+  );
 }
