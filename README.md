@@ -55,7 +55,7 @@ Open http://localhost:3000. Admin is at `/admin` (requires Clerk login).
 5. Row appears in `/admin`
 
 ## Deploy (Vercel)
-1. Push repo, import the `web/` directory into Vercel
+1. Push repo, connect the repo to Vercel (app is at the repo root)
 2. Add all env vars in the Vercel project settings
 3. Set `NEXT_PUBLIC_SITE_URL` to your production domain
 4. Run `npm run db:migrate` (or `db:push`) against your Neon database

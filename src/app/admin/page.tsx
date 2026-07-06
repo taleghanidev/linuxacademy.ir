@@ -6,17 +6,26 @@ import { getBookings, getOrders, getSponsorships } from "./queries";
 
 export const dynamic = "force-dynamic";
 
-// Restrict the dashboard to specific emails when CLERK_ADMIN_EMAILS is set
-// (comma-separated). If unset, any signed-in user may view it.
+// Restrict the dashboard to CLERK_ADMIN_EMAILS (comma-separated). Only *verified*
+// emails count, and if no allowlist is configured we fail closed in production.
 async function assertAdmin() {
   const allowed = (process.env.CLERK_ADMIN_EMAILS || "")
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean);
-  if (allowed.length === 0) return;
+
+  if (allowed.length === 0) {
+    // No allowlist set: allow in dev for convenience, deny in production.
+    if (process.env.NODE_ENV === "production") notFound();
+    return;
+  }
+
   const user = await currentUser();
-  const email = user?.emailAddresses?.[0]?.emailAddress?.toLowerCase();
-  if (!email || !allowed.includes(email)) notFound();
+  const verifiedEmails = (user?.emailAddresses ?? [])
+    .filter((e) => e.verification?.status === "verified")
+    .map((e) => e.emailAddress.toLowerCase());
+
+  if (!verifiedEmails.some((e) => allowed.includes(e))) notFound();
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -72,6 +81,7 @@ export default async function AdminPage() {
                 <Th>Item</Th>
                 <Th>Hours</Th>
                 <Th>Amount</Th>
+                <Th>Note</Th>
                 <Th>Status</Th>
                 <Th>Ref</Th>
                 <Th>Date</Th>
@@ -80,7 +90,7 @@ export default async function AdminPage() {
             <tbody>
               {bookingRows.length === 0 && (
                 <tr>
-                  <td colSpan={8} className="px-4 py-6 text-center text-gray-400">
+                  <td colSpan={9} className="px-4 py-6 text-center text-gray-400">
                     No bookings yet.
                   </td>
                 </tr>
@@ -95,6 +105,11 @@ export default async function AdminPage() {
                   <Td>{b.label}</Td>
                   <Td>{b.quantity}</Td>
                   <Td>{formatRial(b.amount)}</Td>
+                  <Td>
+                    <div className="max-w-48 whitespace-pre-wrap break-words text-gray-600">
+                      {typeof b.meta?.note === "string" && b.meta.note ? b.meta.note : "—"}
+                    </div>
+                  </Td>
                   <Td>
                     <StatusBadge status={b.status} />
                   </Td>
