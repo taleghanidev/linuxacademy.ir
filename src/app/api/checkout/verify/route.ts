@@ -1,6 +1,7 @@
 import { eq } from "drizzle-orm";
-import { db, orders } from "@/db";
+import { customers, db, orderItems, orders } from "@/db";
 import { siteUrl } from "@/lib/checkout";
+import { notifyOrderPaid } from "@/lib/email";
 import { zarinpalVerify } from "@/lib/zarinpal";
 
 // Zarinpal redirects the buyer back here with ?Authority=...&Status=OK|NOK
@@ -48,6 +49,31 @@ export async function GET(request: Request) {
     .update(orders)
     .set({ status: "PAID", refId: result.refId, updatedAt: new Date() })
     .where(eq(orders.id, order.id));
+
+  // Owner notification email (never blocks the customer's redirect).
+  try {
+    const [customer] = await db
+      .select()
+      .from(customers)
+      .where(eq(customers.id, order.customerId))
+      .limit(1);
+    const items = await db.select().from(orderItems).where(eq(orderItems.orderId, order.id));
+    await notifyOrderPaid({
+      refId: result.refId,
+      total: order.total,
+      discount: order.discount,
+      couponCode: order.couponCode,
+      customer: { name: customer.name, email: customer.email, phone: customer.phone },
+      items: items.map((i) => ({
+        label: i.label,
+        quantity: i.quantity,
+        amount: i.amount,
+        type: i.type,
+      })),
+    });
+  } catch (err) {
+    console.error("Order notification failed:", err);
+  }
 
   return Response.redirect(
     `${base}/order/thank-you?ref=${result.refId ?? ""}&order=${order.id}`,

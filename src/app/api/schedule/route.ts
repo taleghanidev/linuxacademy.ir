@@ -4,6 +4,7 @@ import { z } from "zod";
 import { EVENT_DESCRIPTION, EVENT_SUMMARY, SLOT_MINUTES } from "@/config/schedule";
 import { customers, db, orderItems, orders } from "@/db";
 import { getFreeSlotIsos, invalidateBusyCache } from "@/lib/availability";
+import { notifySessionScheduled } from "@/lib/email";
 import { createEvent, isCalendarConfigured } from "@/lib/google-calendar";
 import { isSlotFree } from "@/lib/slots";
 
@@ -146,6 +147,13 @@ export async function POST(request: Request) {
   }
 
   await invalidateBusyCache();
+
+  // Owner notification (non-blocking semantics: errors are swallowed inside).
+  await notifySessionScheduled({
+    customer: { name: customer.name, email: customer.email },
+    startIso,
+    meetLink: event.meetLink,
+  });
 
   return Response.json({
     ok: true,
