@@ -171,8 +171,8 @@ const ARTICLES: Record<Locale, Article[]> = {
 };
 
 function locale(): Locale {
-  if (typeof document !== "undefined" && document.documentElement.dir === "rtl") return "fa";
-  return "fa";
+  if (typeof document === "undefined") return "fa"; // SSR default
+  return document.documentElement.dir === "rtl" ? "fa" : "en";
 }
 
 export const getSponsors = (l: Locale = locale()) => SPONSORS[l];

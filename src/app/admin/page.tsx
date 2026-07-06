@@ -1,8 +1,9 @@
 import { UserButton } from "@clerk/nextjs";
 import { currentUser } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
+import { CustomerCell, DataTable, SectionCard, StatCard, StatusBadge } from "@/components/admin/ui";
 import { formatDate, formatRial } from "@/lib/format";
-import { getBookings, getOrders, getSponsorships } from "./queries";
+import { getBookings, getOrdersDetailed, getSponsorships } from "./queries";
 
 export const dynamic = "force-dynamic";
 
@@ -15,7 +16,6 @@ async function assertAdmin() {
     .filter(Boolean);
 
   if (allowed.length === 0) {
-    // No allowlist set: allow in dev for convenience, deny in production.
     if (process.env.NODE_ENV === "production") notFound();
     return;
   }
@@ -28,162 +28,204 @@ async function assertAdmin() {
   if (!verifiedEmails.some((e) => allowed.includes(e))) notFound();
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    PAID: "bg-green-100 text-green-800",
-    PENDING: "bg-yellow-100 text-yellow-800",
-    FAILED: "bg-red-100 text-red-800",
-    CANCELED: "bg-gray-200 text-gray-700",
-  };
-  return (
-    <span
-      className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${styles[status] ?? "bg-gray-100"}`}
-    >
-      {status}
-    </span>
-  );
+type Session = { start: string };
+
+function sessionsOf(meta: unknown): Session[] {
+  return ((meta as Record<string, unknown>)?.sessions as Session[] | undefined) ?? [];
 }
 
 export default async function AdminPage() {
   await assertAdmin();
 
-  const [bookingRows, sponsorshipRows, orderRows] = await Promise.all([
+  const [bookings, sponsorships, orders] = await Promise.all([
     getBookings(),
     getSponsorships(),
-    getOrders(),
+    getOrdersDetailed(),
   ]);
 
-  const paidOrders = orderRows.filter((o) => o.status === "PAID");
-  const revenue = paidOrders.reduce((sum, o) => sum + o.total, 0);
+  const paidOrders = orders.filter((o) => o.status === "PAID");
+  const pendingOrders = orders.filter((o) => o.status === "PENDING");
+  const revenue = paidOrders.reduce((s, o) => s + o.total, 0);
+  const discounts = paidOrders.reduce((s, o) => s + o.discount, 0);
+
+  const paidBookings = bookings.filter((b) => b.status === "PAID");
+  const sessionsSold = paidBookings.reduce((s, b) => s + b.quantity, 0);
+  const sessionsScheduled = paidBookings.reduce((s, b) => s + sessionsOf(b.meta).length, 0);
+  const paidSponsors = sponsorships.filter((s) => s.status === "PAID");
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-8">
-      <div className="mb-8 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Dashboard</h1>
-        <UserButton />
-      </div>
-
-      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
-        <Stat label="Paid orders" value={String(paidOrders.length)} />
-        <Stat label="Bookings" value={String(bookingRows.length)} />
-        <Stat label="Ad buyers" value={String(sponsorshipRows.length)} />
-        <Stat label="Revenue (paid)" value={formatRial(revenue)} />
-      </div>
-
-      <section className="mb-12">
-        <h2 className="mb-3 text-lg font-semibold">Bookings</h2>
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
-              <tr>
-                <Th>Customer</Th>
-                <Th>Contact</Th>
-                <Th>Item</Th>
-                <Th>Hours</Th>
-                <Th>Amount</Th>
-                <Th>Note</Th>
-                <Th>Status</Th>
-                <Th>Ref</Th>
-                <Th>Date</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {bookingRows.length === 0 && (
-                <tr>
-                  <td colSpan={9} className="px-4 py-6 text-center text-gray-400">
-                    No bookings yet.
-                  </td>
-                </tr>
-              )}
-              {bookingRows.map((b) => (
-                <tr key={b.id} className="border-b last:border-0">
-                  <Td>{b.customerName}</Td>
-                  <Td>
-                    <div>{b.customerEmail}</div>
-                    <div className="text-gray-400">{b.customerPhone}</div>
-                  </Td>
-                  <Td>{b.label}</Td>
-                  <Td>{b.quantity}</Td>
-                  <Td>{formatRial(b.amount)}</Td>
-                  <Td>
-                    <div className="max-w-48 whitespace-pre-wrap break-words text-gray-600">
-                      {typeof b.meta?.note === "string" && b.meta.note ? b.meta.note : "—"}
-                    </div>
-                  </Td>
-                  <Td>
-                    <StatusBadge status={b.status} />
-                  </Td>
-                  <Td>{b.refId ?? "—"}</Td>
-                  <Td>{formatDate(b.createdAt)}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+    <div className="min-h-screen bg-gray-50/80">
+      {/* Header */}
+      <header className="sticky top-0 z-10 border-b bg-white/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-purple to-brand-magenta text-sm font-bold text-white">
+              LA
+            </div>
+            <div>
+              <h1 className="text-lg font-bold leading-tight">Linux Academy — Admin</h1>
+              <p className="text-xs text-gray-400">Orders, bookings & sponsorships</p>
+            </div>
+          </div>
+          <UserButton />
         </div>
-      </section>
+      </header>
 
-      <section>
-        <h2 className="mb-3 text-lg font-semibold">Ad / Sponsorship buyers</h2>
-        <div className="overflow-x-auto rounded-lg border">
-          <table className="w-full text-left text-sm">
-            <thead className="border-b bg-gray-50 text-xs uppercase text-gray-500">
-              <tr>
-                <Th>Customer</Th>
-                <Th>Contact</Th>
-                <Th>Tier</Th>
-                <Th>Qty</Th>
-                <Th>Amount</Th>
-                <Th>Status</Th>
-                <Th>Ref</Th>
-                <Th>Date</Th>
-              </tr>
-            </thead>
-            <tbody>
-              {sponsorshipRows.length === 0 && (
-                <tr>
-                  <td colSpan={8} className="px-4 py-6 text-center text-gray-400">
-                    No sponsors yet.
-                  </td>
-                </tr>
-              )}
-              {sponsorshipRows.map((s) => (
-                <tr key={s.id} className="border-b last:border-0">
-                  <Td>{s.customerName}</Td>
-                  <Td>
-                    <div>{s.customerEmail}</div>
-                    <div className="text-gray-400">{s.customerPhone}</div>
-                  </Td>
-                  <Td>{s.label}</Td>
-                  <Td>{s.quantity}</Td>
-                  <Td>{formatRial(s.amount)}</Td>
-                  <Td>
-                    <StatusBadge status={s.status} />
-                  </Td>
-                  <Td>{s.refId ?? "—"}</Td>
-                  <Td>{formatDate(s.createdAt)}</Td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+      <main className="mx-auto w-full max-w-7xl space-y-8 px-4 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
+          <StatCard label="Revenue (paid)" value={formatRial(revenue)} accent="green" icon="💰" />
+          <StatCard
+            label="Paid orders"
+            value={String(paidOrders.length)}
+            sub={`${pendingOrders.length} pending`}
+            accent="purple"
+            icon="🧾"
+          />
+          <StatCard
+            label="Sessions"
+            value={`${sessionsScheduled}/${sessionsSold}`}
+            sub="scheduled / sold"
+            accent="cyan"
+            icon="📅"
+          />
+          <StatCard
+            label="Sponsors"
+            value={String(paidSponsors.length)}
+            sub={`${sponsorships.length} total`}
+            accent="magenta"
+            icon="📣"
+          />
+          <StatCard label="Discounts given" value={formatRial(discounts)} accent="amber" icon="🏷️" />
         </div>
-      </section>
-    </main>
-  );
-}
 
-function Stat({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="rounded-lg border p-4">
-      <div className="text-xs uppercase text-gray-500">{label}</div>
-      <div className="mt-1 text-xl font-semibold">{value}</div>
+        {/* Orders */}
+        <SectionCard title="Orders" description="Every checkout, newest first.">
+          <DataTable
+            rows={orders}
+            rowKey={(o) => o.id}
+            empty="No orders yet."
+            columns={[
+              {
+                header: "Customer",
+                cell: (o) => (
+                  <CustomerCell
+                    name={o.customerName}
+                    email={o.customerEmail}
+                    phone={o.customerPhone}
+                  />
+                ),
+              },
+              {
+                header: "Items",
+                cell: (o) => <span className="text-gray-600">{o.itemsSummary}</span>,
+              },
+              {
+                header: "Total",
+                cell: (o) => (
+                  <div>
+                    <div className="font-medium">{formatRial(o.total)}</div>
+                    {o.discount > 0 && (
+                      <div className="text-xs text-green-600">
+                        −{formatRial(o.discount)} {o.couponCode && `(${o.couponCode})`}
+                      </div>
+                    )}
+                  </div>
+                ),
+              },
+              { header: "Status", cell: (o) => <StatusBadge status={o.status} /> },
+              { header: "Ref", cell: (o) => <span dir="ltr">{o.refId ?? "—"}</span> },
+              { header: "Date", cell: (o) => formatDate(o.createdAt) },
+            ]}
+          />
+        </SectionCard>
+
+        {/* Bookings */}
+        <SectionCard
+          title="Consultation bookings"
+          description="Purchased hours and their scheduled sessions."
+        >
+          <DataTable
+            rows={bookings}
+            rowKey={(b) => b.id}
+            empty="No bookings yet."
+            columns={[
+              {
+                header: "Customer",
+                cell: (b) => (
+                  <CustomerCell
+                    name={b.customerName}
+                    email={b.customerEmail}
+                    phone={b.customerPhone}
+                  />
+                ),
+              },
+              { header: "Package", cell: (b) => b.label },
+              {
+                header: "Sessions",
+                cell: (b) => {
+                  const done = sessionsOf(b.meta).length;
+                  return (
+                    <span className={done >= b.quantity ? "text-green-600" : ""}>
+                      {done}/{b.quantity}
+                    </span>
+                  );
+                },
+              },
+              {
+                header: "Next session",
+                cell: (b) => {
+                  const next = sessionsOf(b.meta)
+                    .map((s) => new Date(s.start))
+                    .filter((d) => d > new Date())
+                    .sort((a, z) => a.getTime() - z.getTime())[0];
+                  return next ? formatDate(next) : "—";
+                },
+              },
+              { header: "Amount", cell: (b) => formatRial(b.amount) },
+              {
+                header: "Note",
+                cell: (b) => (
+                  <div className="max-w-48 whitespace-pre-wrap break-words text-gray-500">
+                    {typeof (b.meta as Record<string, unknown>)?.note === "string"
+                      ? ((b.meta as Record<string, unknown>).note as string)
+                      : "—"}
+                  </div>
+                ),
+              },
+              { header: "Status", cell: (b) => <StatusBadge status={b.status} /> },
+              { header: "Date", cell: (b) => formatDate(b.createdAt) },
+            ]}
+          />
+        </SectionCard>
+
+        {/* Sponsors */}
+        <SectionCard title="Ad / sponsorship buyers" description="Who bought which tier.">
+          <DataTable
+            rows={sponsorships}
+            rowKey={(s) => s.id}
+            empty="No sponsors yet."
+            columns={[
+              {
+                header: "Customer",
+                cell: (s) => (
+                  <CustomerCell
+                    name={s.customerName}
+                    email={s.customerEmail}
+                    phone={s.customerPhone}
+                  />
+                ),
+              },
+              { header: "Tier", cell: (s) => s.label },
+              { header: "Qty", cell: (s) => s.quantity },
+              { header: "Amount", cell: (s) => formatRial(s.amount) },
+              { header: "Status", cell: (s) => <StatusBadge status={s.status} /> },
+              { header: "Ref", cell: (s) => <span dir="ltr">{s.refId ?? "—"}</span> },
+              { header: "Date", cell: (s) => formatDate(s.createdAt) },
+            ]}
+          />
+        </SectionCard>
+      </main>
     </div>
   );
-}
-
-function Th({ children }: { children: React.ReactNode }) {
-  return <th className="px-4 py-2 font-medium">{children}</th>;
-}
-
-function Td({ children }: { children: React.ReactNode }) {
-  return <td className="px-4 py-2 align-top">{children}</td>;
 }

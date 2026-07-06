@@ -52,23 +52,29 @@ const Schedule = () => {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    // Load status and availability independently: a calendar hiccup should not
+    // hide the customer's session status.
     try {
-      const [sRes, aRes] = await Promise.all([
-        fetch(`/api/schedule?order=${encodeURIComponent(orderId)}`),
-        fetch("/api/availability"),
-      ]);
+      const sRes = await fetch(`/api/schedule?order=${encodeURIComponent(orderId)}`);
       const sJson = await sRes.json();
-      const aJson = await aRes.json();
-      if (!sRes.ok) throw new Error(sJson.error || "status failed");
-      if (!aRes.ok) throw new Error(aJson.error || t.couldNotLoadSlots);
+      if (!sRes.ok) throw new Error(sJson.error || t.couldNotFetchBookingsLeft);
       setStatus(sJson);
+    } catch (e: any) {
+      setError(e.message || t.couldNotFetchBookingsLeft);
+      setLoading(false);
+      return;
+    }
+    try {
+      const aRes = await fetch("/api/availability");
+      const aJson = await aRes.json();
+      if (!aRes.ok) throw new Error(aJson.error || t.couldNotLoadSlots);
       setSlots(aJson.slots || []);
     } catch (e: any) {
       setError(e.message || t.couldNotLoadSlots);
     } finally {
       setLoading(false);
     }
-  }, [orderId, t.couldNotLoadSlots]);
+  }, [orderId, t.couldNotLoadSlots, t.couldNotFetchBookingsLeft]);
 
   useEffect(() => {
     if (orderId) load();

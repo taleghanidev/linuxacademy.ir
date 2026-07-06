@@ -39,3 +39,39 @@ export function getSponsorships() {
 export function getOrders() {
   return db.select().from(orders).orderBy(desc(orders.createdAt));
 }
+
+// Orders joined with customer + their line items (for the orders table).
+export async function getOrdersDetailed() {
+  const orderRows = await db
+    .select({
+      id: orders.id,
+      subtotal: orders.subtotal,
+      discount: orders.discount,
+      total: orders.total,
+      couponCode: orders.couponCode,
+      status: orders.status,
+      refId: orders.refId,
+      createdAt: orders.createdAt,
+      customerName: customers.name,
+      customerEmail: customers.email,
+      customerPhone: customers.phone,
+    })
+    .from(orders)
+    .innerJoin(customers, eq(orders.customerId, customers.id))
+    .orderBy(desc(orders.createdAt));
+
+  const items = await db
+    .select({
+      orderId: orderItems.orderId,
+      label: orderItems.label,
+      quantity: orderItems.quantity,
+      type: orderItems.type,
+    })
+    .from(orderItems);
+
+  const byOrder = new Map<string, string[]>();
+  for (const i of items) {
+    byOrder.set(i.orderId, [...(byOrder.get(i.orderId) ?? []), `${i.label} ×${i.quantity}`]);
+  }
+  return orderRows.map((o) => ({ ...o, itemsSummary: (byOrder.get(o.id) ?? []).join(" · ") }));
+}

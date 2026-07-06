@@ -60,8 +60,8 @@ export const PACKAGE_TEXT: Record<Locale, Record<string, PackageText>> = {
 };
 
 function locale(): Locale {
-  if (typeof document !== "undefined" && document.documentElement.dir === "rtl") return "fa";
-  return "fa";
+  if (typeof document === "undefined") return "fa"; // SSR default
+  return document.documentElement.dir === "rtl" ? "fa" : "en";
 }
 
 export const tierText = (key: string, l: Locale = locale()): TierText =>

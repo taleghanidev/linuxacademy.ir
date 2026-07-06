@@ -1,10 +1,10 @@
 "use client";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
 import moment from "moment-jalaali";
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import BookingForm from "@/components/BookingForm";
+import FaqAccordion from "@/components/FaqAccordion";
 import { GlobalContext } from "@/components/GlobalContext";
 import NavBar from "@/components/NavBar";
 import ServiceCard from "@/components/ServiceCard";
@@ -73,7 +73,6 @@ const CookieConsent: React.FC = () => {
 const Index: React.FC<IndexProps> = () => {
   const language: any = document.documentElement.dir === "rtl" ? faIndex : enIndex;
   const [isVisible, setIsVisible] = useState(false);
-  const [openFaqItem, setOpenFaqItem] = useState<number | null>(null);
   const [sponsors, setSponsors] = useState([]);
   const [articles, setArticles] = useState([]);
   const [faqs, setFaqs] = useState([]);
@@ -88,10 +87,6 @@ const Index: React.FC<IndexProps> = () => {
   const homeLang = document.documentElement.dir === "rtl" ? homeFa : homeEn;
   const location = useLocation();
   const navigate = useNavigate();
-
-  const toggleFaq = (index: number) => {
-    setOpenFaqItem(openFaqItem === index ? null : index);
-  };
 
   useEffect(() => {
     // Content is static now (no Strapi).
@@ -696,31 +691,7 @@ const Index: React.FC<IndexProps> = () => {
               className={`max-w-3xl mx-auto ${isVisible ? "animate-fade-in" : "opacity-0"}`}
               style={{ animationDelay: "0.3s" }}
             >
-              {faqs.map((item, index) => (
-                <div key={index} className="mb-4">
-                  <button
-                    onClick={() => toggleFaq(index)}
-                    className="w-full flex justify-between items-center p-4 bg-[#FAFAFF] hover:bg-gray-100 rounded-lg transition-colors duration-200 focus:outline-none"
-                  >
-                    <span
-                      className={`font-medium ${document.documentElement.dir === "rtl" ? "text-right" : "text-left"}`}
-                    >
-                      {item.question}
-                    </span>
-                    {openFaqItem === index ? (
-                      <ChevronUp className="h-5 w-5 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="h-5 w-5 text-gray-500" />
-                    )}
-                  </button>
-
-                  {openFaqItem === index && (
-                    <div className="p-4 bg-gray-50 rounded-b-lg mt-[-0.25rem] border-t border-gray-100">
-                      <p className="text-gray-600">{item.answer}</p>
-                    </div>
-                  )}
-                </div>
-              ))}
+              <FaqAccordion items={faqs} />
             </div>
           </div>
         </section>
