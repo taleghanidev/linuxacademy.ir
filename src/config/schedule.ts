@@ -1,7 +1,7 @@
 // Consultation scheduling config (formerly the Strapi "available-hours" table).
 // All times below are in OWNER_TIMEZONE. Edit freely.
 
-export const OWNER_TIMEZONE = "Asia/Tehran";
+export const OWNER_TIMEZONE = "Australia/Sydney";
 
 // Session length in minutes (1 purchased hour = 1 session).
 export const SLOT_MINUTES = 60;
