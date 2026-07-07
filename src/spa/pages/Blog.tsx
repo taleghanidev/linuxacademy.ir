@@ -3,6 +3,7 @@
 import moment from "moment-jalaali";
 import { useEffect, useState } from "react";
 import NavBar from "@/components/NavBar";
+import PageShell, { useIsFa } from "@/components/PageShell";
 import {
   Pagination,
   PaginationContent,
@@ -32,8 +33,9 @@ const Blog = () => {
   const [error, _setError] = useState(false);
   const articlesPerPage = 9; // Increased number of articles per page
 
-  const _contactFormLang = document.documentElement.dir === "rtl" ? contactFormFa : contactFormEn;
-  const blogLang = document.documentElement.dir === "rtl" ? blogPageFa : blogPageEn;
+  const isFa = useIsFa();
+  const _contactFormLang = isFa ? contactFormFa : contactFormEn;
+  const blogLang = isFa ? blogPageFa : blogPageEn;
 
   useEffect(() => {
     // Articles are static now (no Strapi).
@@ -113,7 +115,7 @@ const Blog = () => {
   if (error) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <NavBar lang={document.documentElement.dir === "rtl" ? navBarFa : navBarEn} />
+        <NavBar lang={isFa ? navBarFa : navBarEn} />
         <div className="text-center mt-20">
           <h2 className="text-2xl font-bold text-red-600 mb-4">خطا در بارگذاری اطلاعات</h2>
           <p className="text-gray-700 mb-6">
@@ -131,9 +133,7 @@ const Blog = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <NavBar lang={document.documentElement.dir === "rtl" ? navBarFa : navBarEn} />
-
+    <PageShell container={false}>
       {/* Blog Header Section */}
       <section className="container mx-auto pt-24 pb-4">
         <h1 className="text-4xl font-bold mb-6 text-center">{blogLang.header.title}</h1>
@@ -242,7 +242,7 @@ const Blog = () => {
                         <div
                           className={`absolute top-3 left-3 ${colorClass} text-white text-xs px-2 py-1 rounded-md`}
                         >
-                          {document.documentElement.dir === "rtl"
+                          {isFa
                             ? moment(article.publishedAt).format("jYYYY/jMM/jDD")
                             : new Date(article.publishedAt).toLocaleDateString()}
                         </div>
@@ -252,19 +252,13 @@ const Blog = () => {
                           <Link to={`/blog/${article.slug}`}>{article.title}</Link>
                         </h3>
                         <p className="text-gray-600 text-sm line-clamp-3 mb-3">{article.summary}</p>
-                        <div
-                          className={
-                            document.documentElement.dir === "rtl"
-                              ? "flex justify-end"
-                              : "flex justify-start"
-                          }
-                        >
+                        <div className={isFa ? "flex justify-end" : "flex justify-start"}>
                           <Link
                             to={`/blog/${article.slug}`}
                             className={`text-${colorIndex === 0 ? "brand-purple" : colorIndex === 1 ? "brand-magenta" : "brand-cyan"} font-medium text-sm flex items-center`}
                           >
                             {blogLang.post.readMore}
-                            {document.documentElement.dir === "rtl" ? (
+                            {isFa ? (
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 className="h-4 w-4 mr-1"
@@ -353,7 +347,7 @@ const Blog = () => {
           )}
         </div>
       </section>
-    </div>
+    </PageShell>
   );
 };
 
