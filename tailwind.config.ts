@@ -94,6 +94,7 @@ export default {
             DEFAULT: "#06B6D4",
             dark: "#0E7490",
           },
+          tint: "#FAFAFF",
         },
       },
       borderRadius: {

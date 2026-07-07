@@ -23,7 +23,7 @@ export default function FaqAccordion({ items }: { items: FaqItem[] }) {
             className={`overflow-hidden rounded-xl border transition-colors duration-300 ${
               open
                 ? "border-brand-purple/40 bg-white shadow-sm"
-                : "border-transparent bg-[#FAFAFF] hover:bg-gray-100"
+                : "border-transparent bg-brand-tint hover:bg-gray-100"
             }`}
           >
             <button

@@ -164,7 +164,7 @@ const Index: React.FC<IndexProps> = () => {
           </div>
         </section>
         {/* Booking Section Skeleton */}
-        <section className="pt-0 pb-16 bg-[#FAFAFF] animate-pulse">
+        <section className="pt-0 pb-16 bg-brand-tint animate-pulse">
           <div className="container grid md:grid-cols-2 gap-8 items-center">
             <div className="h-96 bg-gray-200 rounded-lg" />
             <div>
@@ -197,7 +197,7 @@ const Index: React.FC<IndexProps> = () => {
           </div>
         </section>
         {/* Experience Section Skeleton */}
-        <section className="py-16 bg-[#FAFAFF] animate-pulse">
+        <section className="py-16 bg-brand-tint animate-pulse">
           <div className="container">
             <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-8" />
             <div className="grid md:grid-cols-3 gap-6">
@@ -218,7 +218,7 @@ const Index: React.FC<IndexProps> = () => {
           </div>
         </section>
         {/* Sponsors Section Skeleton */}
-        <section className="py-16 bg-[#FAFAFF] animate-pulse">
+        <section className="py-16 bg-brand-tint animate-pulse">
           <div className="container">
             <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-8" />
             <div className="flex gap-6 justify-center items-center">
@@ -243,7 +243,7 @@ const Index: React.FC<IndexProps> = () => {
           </div>
         </section>
         {/* Blog Section Skeleton */}
-        <section className="py-16 bg-[#FAFAFF] animate-pulse">
+        <section className="py-16 bg-brand-tint animate-pulse">
           <div className="container">
             <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-8" />
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -390,7 +390,7 @@ const Index: React.FC<IndexProps> = () => {
         </section>
 
         {/* Booking Section */}
-        <section id="book" className="pt-0 pb-16 bg-[#FAFAFF]">
+        <section id="book" className="pt-0 pb-16 bg-brand-tint">
           <div className="container grid md:grid-cols-2 gap-8 items-center">
             <div
               id="booking-form-container"
@@ -498,7 +498,7 @@ const Index: React.FC<IndexProps> = () => {
         </section>
 
         {/* Experience Section */}
-        <section className="py-16 bg-[#FAFAFF]">
+        <section className="py-16 bg-brand-tint">
           <div className="container">
             <div
               className={`text-center max-w-xl mx-auto mb-12 ${isVisible ? "animate-fade-in" : "opacity-0"}`}
@@ -614,7 +614,7 @@ const Index: React.FC<IndexProps> = () => {
         </section>
 
         {/* Sponsors Section  */}
-        <section className="py-16 bg-[#FAFAFF]">
+        <section className="py-16 bg-brand-tint">
           <div className="container">
             <div
               className={`text-center max-w-xl mx-auto mb-12 ${isVisible ? "animate-fade-in" : "opacity-0"}`}
@@ -697,7 +697,7 @@ const Index: React.FC<IndexProps> = () => {
         </section>
 
         {/* Blog Section - Updated to show latest articles */}
-        <section id="blog" className="py-16 bg-[#FAFAFF]">
+        <section id="blog" className="py-16 bg-brand-tint">
           <div className="container">
             <div
               className={`text-center max-w-xl mx-auto mb-12 ${isVisible ? "animate-fade-in" : "opacity-0"}`}
