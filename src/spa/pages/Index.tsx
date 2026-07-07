@@ -7,6 +7,7 @@ import BookingForm from "@/components/BookingForm";
 import FaqAccordion from "@/components/FaqAccordion";
 import { GlobalContext } from "@/components/GlobalContext";
 import NavBar from "@/components/NavBar";
+import PageShell from "@/components/PageShell";
 import ServiceCard from "@/components/ServiceCard";
 import SponsorLogo from "@/components/SponsorLogo";
 import { getArticles, getFaqs, getPositions, getSponsors } from "@/config/content";
@@ -269,10 +270,9 @@ const Index: React.FC<IndexProps> = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageShell container={false}>
       {/* Main content */}
       <div>
-        <NavBar lang={navBarLang} />
         {/* Hero Section with Booking Form Overlay */}
         <section id="home" className="pt-24 md:pt-32 pb-16 md:pb-32 relative bg-white">
           <div className="container grid md:grid-cols-2 gap-8 items-center">
@@ -802,7 +802,7 @@ const Index: React.FC<IndexProps> = () => {
         </section>
       </div>
       <CookieConsent />
-    </div>
+    </PageShell>
   );
 };
 
