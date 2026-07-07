@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { evaluateCoupon } from "@/config/coupons";
+import { evaluateCouponServer } from "@/lib/coupons";
 import { getPackage, getTier } from "@/config/products";
 import { db, orderItems, orders } from "@/db";
 import { siteUrl, upsertCustomer } from "@/lib/checkout";
@@ -102,7 +102,7 @@ export async function POST(request: Request) {
   let discount = 0;
   let appliedCoupon: string | null = null;
   if (couponCode?.trim()) {
-    const result = evaluateCoupon(
+    const result = await evaluateCouponServer(
       couponCode,
       priced.map((l) => ({ type: l.type, amount: l.amount })),
     );

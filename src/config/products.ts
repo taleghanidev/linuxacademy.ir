@@ -23,7 +23,7 @@ export const CONSULTING_PACKAGES: ConsultingPackage[] = [
     key: "linux-consult",
     title: "Linux & DevOps Consultation",
     description: "One-on-one consulting on Linux, infrastructure, and DevOps.",
-    hourlyRate: 5_000_000,
+    hourlyRate: 3_000_000,
     minHours: 1,
     maxHours: 8,
   },

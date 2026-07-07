@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { customers, db, orderItems, orders } from "@/db";
+import { coupons, customers, db, orderItems, orders } from "@/db";
 
 // One row per order line, joined with its order (payment) and customer.
 function itemsByType(type: "booking" | "sponsorship") {
@@ -74,4 +74,31 @@ export async function getOrdersDetailed() {
     byOrder.set(i.orderId, [...(byOrder.get(i.orderId) ?? []), `${i.label} ×${i.quantity}`]);
   }
   return orderRows.map((o) => ({ ...o, itemsSummary: (byOrder.get(o.id) ?? []).join(" · ") }));
+}
+
+// Customers with aggregated order count + total paid (Toman).
+export async function getCustomers() {
+  const custRows = await db.select().from(customers).orderBy(desc(customers.createdAt));
+  const orderRows = await db
+    .select({ customerId: orders.customerId, total: orders.total, status: orders.status })
+    .from(orders);
+
+  const agg = new Map<string, { count: number; spent: number }>();
+  for (const o of orderRows) {
+    const a = agg.get(o.customerId) ?? { count: 0, spent: 0 };
+    a.count += 1;
+    if (o.status === "PAID") a.spent += o.total;
+    agg.set(o.customerId, a);
+  }
+
+  return custRows.map((c) => ({
+    ...c,
+    orderCount: agg.get(c.id)?.count ?? 0,
+    spent: agg.get(c.id)?.spent ?? 0,
+  }));
+}
+
+// All admin-managed discount codes, newest first.
+export function getCouponsList() {
+  return db.select().from(coupons).orderBy(desc(coupons.createdAt));
 }

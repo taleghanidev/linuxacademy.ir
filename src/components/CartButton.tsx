@@ -5,7 +5,10 @@ import { usePathname } from "next/navigation";
 import { useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 
-// Floating cart button with a live item count. Hidden on the cart page itself.
+/**
+ * Minimal floating cart toggle: a small icon pinned top-end with a live
+ * item-count badge. Hidden on the cart page itself.
+ */
 export default function CartButton() {
   const { count } = useCart();
   const pathname = usePathname();
@@ -15,11 +18,11 @@ export default function CartButton() {
     <Link
       to="/cart"
       aria-label="Cart"
-      className="fixed bottom-5 end-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-brand-purple text-white shadow-lg transition-transform hover:scale-105"
+      className="fixed end-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-full border border-gray-200 bg-white/80 text-gray-700 shadow-sm backdrop-blur transition-colors hover:border-brand-purple hover:text-brand-purple"
     >
-      <ShoppingCart className="h-6 w-6" />
+      <ShoppingCart className="h-[18px] w-[18px]" />
       {count > 0 && (
-        <span className="absolute -top-1 -end-1 flex h-6 min-w-6 items-center justify-center rounded-full bg-brand-magenta px-1 text-xs font-bold">
+        <span className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-brand-magenta px-1 text-[10px] font-bold leading-none text-white">
           {count}
         </span>
       )}

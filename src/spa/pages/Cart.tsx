@@ -1,57 +1,84 @@
 "use client";
 
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowLeft, Lock, ShieldCheck } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import CartLineItem from "@/components/cart/CartLineItem";
+import CouponField from "@/components/cart/CouponField";
+import CustomerFields, { type Customer } from "@/components/cart/CustomerFields";
+import EmptyCart from "@/components/cart/EmptyCart";
+import OrderTotals from "@/components/cart/OrderTotals";
 import NavBar from "@/components/NavBar";
-import { evaluateCoupon } from "@/config/coupons";
 import navBarEn from "@/language/en/components/navBar";
 import cartEn from "@/language/en/pages/cart";
 import navBarFa from "@/language/fa/components/navBar";
 import cartFa from "@/language/fa/pages/cart";
-import { useCart } from "@/lib/cart";
+import { type CartItemType, useCart } from "@/lib/cart";
 import { Link } from "@/lib/router";
 
 const Cart = () => {
   const { items, subtotal, updateQuantity, removeItem, clear } = useCart();
-  const isFa = document.documentElement.dir === "rtl";
+  const isFa = typeof document !== "undefined" && document.documentElement.dir === "rtl";
   const t = isFa ? cartFa : cartEn;
   const navLang = isFa ? navBarFa : navBarEn;
   const currency = isFa ? "تومان" : "T";
+
+  const typeLabel = (type: CartItemType): string =>
+    type === "sponsorship" ? (isFa ? "اسپانسری" : "Sponsorship") : isFa ? "مشاوره" : "Consultation";
+
+  const unitLabel = (type: CartItemType): string | undefined =>
+    type === "booking" ? t.labels.hour : undefined;
 
   const [couponInput, setCouponInput] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
   const [couponError, setCouponError] = useState<string | null>(null);
 
-  const [customer, setCustomer] = useState({ name: "", email: "", phone: "" });
+  const [customer, setCustomer] = useState<Customer>({ name: "", email: "", phone: "" });
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fmt = (n: number) => `${n.toLocaleString("en-US")} ${currency}`;
+  const [discount, setDiscount] = useState(0);
 
-  const discount = useMemo(() => {
-    if (!appliedCoupon) return 0;
-    const result = evaluateCoupon(
-      appliedCoupon,
-      items.map((i) => ({ type: i.type, amount: i.unitPrice * i.quantity })),
-    );
-    return result.valid ? result.discount : 0;
-  }, [appliedCoupon, items]);
-
-  const total = Math.max(0, subtotal - discount);
+  // Validate a code against the server (honors admin-managed DB codes + static).
+  const validateCoupon = useCallback(
+    async (code: string, silent = false) => {
+      if (!code.trim() || items.length === 0) return;
+      try {
+        const res = await fetch("/api/coupon", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            code,
+            lines: items.map((i) => ({ type: i.type, amount: i.unitPrice * i.quantity })),
+          }),
+        });
+        const result = await res.json();
+        if (result.valid) {
+          setAppliedCoupon(result.code);
+          setDiscount(result.discount);
+          setCouponError(null);
+        } else {
+          setAppliedCoupon(null);
+          setDiscount(0);
+          if (!silent) setCouponError(t.errors?.invalidCoupon || "Invalid coupon");
+        }
+      } catch {
+        if (!silent) setCouponError(t.errors?.invalidCoupon || "Invalid coupon");
+      }
+    },
+    [items, t],
+  );
 
   const applyCoupon = () => {
     setCouponError(null);
-    const result = evaluateCoupon(
-      couponInput,
-      items.map((i) => ({ type: i.type, amount: i.unitPrice * i.quantity })),
-    );
-    if (result.valid) {
-      setAppliedCoupon(result.code);
-    } else {
-      setAppliedCoupon(null);
-      setCouponError(t.errors?.invalidCoupon || "Invalid coupon");
-    }
+    validateCoupon(couponInput);
   };
+
+  // Keep the discount correct as the cart contents change.
+  useEffect(() => {
+    if (appliedCoupon) validateCoupon(appliedCoupon, true);
+  }, [appliedCoupon, validateCoupon]);
+
+  const total = Math.max(0, subtotal - discount);
 
   const checkout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,145 +118,106 @@ const Cart = () => {
     }
   };
 
+  const itemCount = items.reduce((n, i) => n + i.quantity, 0);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <NavBar lang={navLang} />
-      <div className="container mx-auto px-4 pt-28 pb-16 max-w-5xl">
-        <h1 className="text-3xl font-bold mb-8">{t.headings?.orderSummary || "Cart"}</h1>
+      <div className="container mx-auto max-w-5xl px-4 pb-16 pt-28">
+        <div className="mb-8 flex items-baseline gap-3">
+          <h1 className="text-3xl font-bold text-gray-900">{t.headings?.orderSummary || "Cart"}</h1>
+          {items.length > 0 && (
+            <span className="text-sm text-gray-500">
+              {itemCount} {isFa ? "مورد" : itemCount === 1 ? "item" : "items"}
+            </span>
+          )}
+        </div>
 
         {items.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-sm p-10 text-center">
-            <p className="text-gray-600 mb-6">{t.buttons.emptyCart}</p>
-            <Link
-              to="/sponsor"
-              className="inline-block px-6 py-2 bg-brand-purple text-white rounded-md hover:bg-brand-purple/90"
-            >
-              {t.buttons.continueShopping}
-            </Link>
-          </div>
+          <EmptyCart
+            message={t.buttons.emptyCart}
+            action={
+              <Link
+                to="/sponsor"
+                className="inline-block rounded-lg bg-brand-purple px-6 py-2.5 font-medium text-white transition-colors hover:bg-brand-purple-dark"
+              >
+                {t.buttons.continueShopping}
+              </Link>
+            }
+          />
         ) : (
           <div className="grid gap-8 lg:grid-cols-3">
             {/* Line items */}
-            <div className="lg:col-span-2 space-y-4">
+            <div className="space-y-4 lg:col-span-2">
               {items.map((item) => (
-                <div
+                <CartLineItem
                   key={item.id}
-                  className="bg-white rounded-lg shadow-sm p-4 flex items-center gap-4"
-                >
-                  <div className="flex-grow">
-                    <div className="font-semibold">{item.label}</div>
-                    <div className="text-sm text-gray-500">
-                      {fmt(item.unitPrice)} × {item.quantity}
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="h-8 w-8 rounded border flex items-center justify-center hover:bg-gray-50"
-                      aria-label="decrease"
-                    >
-                      <Minus className="h-4 w-4" />
-                    </button>
-                    <span className="w-8 text-center">{item.quantity}</span>
-                    <button
-                      type="button"
-                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="h-8 w-8 rounded border flex items-center justify-center hover:bg-gray-50"
-                      aria-label="increase"
-                    >
-                      <Plus className="h-4 w-4" />
-                    </button>
-                  </div>
-                  <div className="w-32 text-end font-medium">
-                    {fmt(item.unitPrice * item.quantity)}
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeItem(item.id)}
-                    className="text-gray-400 hover:text-red-600"
-                    aria-label={t.buttons.remove}
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
+                  label={item.label}
+                  type={item.type}
+                  typeLabel={typeLabel(item.type)}
+                  unitPrice={item.unitPrice}
+                  quantity={item.quantity}
+                  currency={currency}
+                  min={item.minQuantity}
+                  max={item.maxQuantity}
+                  unitLabel={unitLabel(item.type)}
+                  onQuantityChange={(q) => updateQuantity(item.id, q)}
+                  onRemove={() => removeItem(item.id)}
+                  removeLabel={t.buttons.remove}
+                  decreaseLabel={isFa ? "کاهش" : "decrease"}
+                  increaseLabel={isFa ? "افزایش" : "increase"}
+                />
               ))}
               <Link
                 to="/sponsor"
-                className="inline-block text-brand-purple hover:underline text-sm"
+                className="inline-flex items-center gap-1.5 text-sm text-brand-purple transition-colors hover:text-brand-purple-dark"
               >
-                ← {t.buttons.continueShopping}
+                <ArrowLeft className="h-4 w-4 rtl:rotate-180" />
+                {t.buttons.continueShopping}
               </Link>
             </div>
 
             {/* Summary + checkout */}
-            <form onSubmit={checkout} className="bg-white rounded-lg shadow-sm p-6 h-fit space-y-4">
-              {/* Coupon */}
-              <div>
-                <label className="block text-sm font-medium mb-1">{t.labels.coupon}</label>
-                <div className="flex gap-2">
-                  <input
-                    value={couponInput}
-                    onChange={(e) => setCouponInput(e.target.value)}
-                    placeholder={t.labels.enterCoupon}
-                    className="flex-grow rounded border px-3 py-2 text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={applyCoupon}
-                    className="px-3 py-2 rounded border text-sm hover:bg-gray-50 whitespace-nowrap"
-                  >
-                    {t.buttons.applyCoupon}
-                  </button>
-                </div>
-                {couponError && <p className="text-xs text-red-600 mt-1">{couponError}</p>}
-                {appliedCoupon && (
-                  <p className="text-xs text-green-600 mt-1">
-                    {appliedCoupon} −{fmt(discount)}
-                  </p>
-                )}
+            <form
+              onSubmit={checkout}
+              className="h-fit space-y-5 rounded-2xl border border-gray-100 bg-white p-6 shadow-sm lg:sticky lg:top-28"
+            >
+              <CouponField
+                value={couponInput}
+                onChange={setCouponInput}
+                onApply={applyCoupon}
+                label={t.labels.coupon}
+                placeholder={t.labels.enterCoupon}
+                applyLabel={t.buttons.applyCoupon}
+                currency={currency}
+                error={couponError}
+                appliedCode={appliedCoupon}
+                discount={discount}
+              />
+
+              <div className="border-t border-gray-100 pt-5">
+                <OrderTotals
+                  subtotal={subtotal}
+                  discount={discount}
+                  total={total}
+                  currency={currency}
+                  labels={{
+                    subtotal: t.labels.subtotal,
+                    discount: t.labels.coupon,
+                    total: t.labels.total,
+                  }}
+                />
               </div>
 
-              <div className="border-t pt-4 space-y-1 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">{t.labels.subtotal}</span>
-                  <span>{fmt(subtotal)}</span>
-                </div>
-                {discount > 0 && (
-                  <div className="flex justify-between text-green-700">
-                    <span>{t.labels.coupon}</span>
-                    <span>−{fmt(discount)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-lg font-semibold pt-2">
-                  <span>{t.labels.total}</span>
-                  <span>{fmt(total)}</span>
-                </div>
-              </div>
-
-              {/* Customer */}
-              <div className="border-t pt-4 space-y-3">
-                <input
-                  required
-                  placeholder={t.labels.name}
-                  value={customer.name}
-                  onChange={(e) => setCustomer({ ...customer, name: e.target.value })}
-                  className="w-full rounded border px-3 py-2 text-sm"
-                />
-                <input
-                  required
-                  type="email"
-                  placeholder={t.labels.email}
-                  value={customer.email}
-                  onChange={(e) => setCustomer({ ...customer, email: e.target.value })}
-                  className="w-full rounded border px-3 py-2 text-sm"
-                />
-                <input
-                  required
-                  placeholder={t.labels.phone}
-                  value={customer.phone}
-                  onChange={(e) => setCustomer({ ...customer, phone: e.target.value })}
-                  className="w-full rounded border px-3 py-2 text-sm"
+              <div className="border-t border-gray-100 pt-5">
+                <CustomerFields
+                  value={customer}
+                  onChange={setCustomer}
+                  labels={{
+                    name: t.labels.name,
+                    email: t.labels.email,
+                    phone: t.labels.phone,
+                  }}
                 />
               </div>
 
@@ -238,10 +226,21 @@ const Cart = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full rounded bg-brand-purple py-2.5 font-medium text-white hover:bg-brand-purple/90 disabled:opacity-50"
+                className="w-full rounded-xl bg-gradient-to-r from-brand-purple to-brand-magenta py-3 font-semibold text-white shadow-sm transition-opacity hover:opacity-95 disabled:opacity-50"
               >
                 {submitting ? t.buttons.processing : t.buttons.checkout}
               </button>
+
+              <div className="flex items-center justify-center gap-4 text-[11px] text-gray-400">
+                <span className="flex items-center gap-1">
+                  <ShieldCheck className="h-3.5 w-3.5" />
+                  {isFa ? "پرداخت امن" : "Secure payment"}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Lock className="h-3.5 w-3.5" />
+                  {isFa ? "زرین‌پال" : "Zarinpal"}
+                </span>
+              </div>
             </form>
           </div>
         )}

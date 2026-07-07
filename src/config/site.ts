@@ -24,7 +24,7 @@ export const SITE_SETTINGS: GlobalSettings = {
   siteDescriptionFa: "دِواپس، زیرساخت‌های ابری و هوش مصنوعی برای کسب‌وکارهای مدرن",
   favicon: "/images/favicon.ico",
   logo: "/images/linuxlogo.png",
-  hourlyRate: 5_000_000,
+  hourlyRate: 3_000_000,
   metaTitleEn: "Linux Academy",
   metaTitleFa: "لینوکس آکادمی",
   metaDescriptionEn: "DevOps, cloud infrastructure and AI consulting.",

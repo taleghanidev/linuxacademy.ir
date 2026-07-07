@@ -8,6 +8,9 @@ export type Coupon = {
   minSubtotal?: number; // minimum order subtotal (Toman) to qualify
   appliesTo?: "all" | "booking" | "sponsorship";
   active?: boolean;
+  expiresAt?: string | Date | null; // ISO string or Date; null/undefined = never
+  usageLimit?: number | null; // max redemptions; null/undefined = unlimited
+  usedCount?: number; // redemptions so far
 };
 
 export const COUPONS: Coupon[] = [
@@ -30,12 +33,33 @@ export type CouponResult =
 
 // Compute the discount for a coupon code against the given lines.
 // Returns a clamped, integer Toman discount. Shared by client + server.
-export function evaluateCoupon(codeRaw: string, lines: CartLineForCoupon[]): CouponResult {
+// `coupons` defaults to the built-in static list; the server passes a merged
+// list that also includes admin-managed codes from the database.
+export function evaluateCoupon(
+  codeRaw: string,
+  lines: CartLineForCoupon[],
+  coupons: Coupon[] = COUPONS,
+): CouponResult {
   const code = codeRaw.trim().toUpperCase();
   if (!code) return { valid: false, reason: "empty" };
 
-  const coupon = COUPONS.find((c) => c.code.toUpperCase() === code && c.active !== false);
+  const coupon = coupons.find((c) => c.code.toUpperCase() === code && c.active !== false);
   if (!coupon) return { valid: false, reason: "not_found" };
+
+  if (coupon.expiresAt) {
+    const exp = coupon.expiresAt instanceof Date ? coupon.expiresAt : new Date(coupon.expiresAt);
+    if (!Number.isNaN(exp.getTime()) && exp.getTime() < Date.now()) {
+      return { valid: false, reason: "expired" };
+    }
+  }
+
+  if (
+    typeof coupon.usageLimit === "number" &&
+    coupon.usageLimit > 0 &&
+    (coupon.usedCount ?? 0) >= coupon.usageLimit
+  ) {
+    return { valid: false, reason: "usage_limit" };
+  }
 
   const scope = coupon.appliesTo ?? "all";
   const eligible = lines.filter((l) => scope === "all" || l.type === scope);

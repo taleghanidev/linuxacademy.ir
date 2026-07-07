@@ -1,5 +1,6 @@
 // Reusable admin dashboard building blocks (server-safe, no client JS needed).
 
+import { Inbox } from "lucide-react";
 import type { ReactNode } from "react";
 
 /* ---------- Stat card ---------- */
@@ -77,14 +78,14 @@ const STATUS_STYLES: Record<string, string> = {
   CANCELED: "bg-gray-100 text-gray-600 ring-gray-500/20",
 };
 
-export function StatusBadge({ status }: { status: string }) {
+export function StatusBadge({ status, label }: { status: string; label?: string }) {
   return (
     <span
       className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ring-1 ring-inset ${
         STATUS_STYLES[status] ?? "bg-gray-100 text-gray-600 ring-gray-500/20"
       }`}
     >
-      {status}
+      {label ?? status}
     </span>
   );
 }
@@ -150,8 +151,8 @@ export function DataTable<Row>({
 
 export function EmptyState({ message }: { message: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-1 py-10 text-center">
-      <div className="text-2xl">🗂️</div>
+    <div className="flex flex-col items-center justify-center gap-2 py-10 text-center">
+      <Inbox className="h-6 w-6 text-gray-300" />
       <p className="text-sm text-gray-400">{message}</p>
     </div>
   );
