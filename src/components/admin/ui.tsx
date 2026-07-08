@@ -1,6 +1,8 @@
 // Reusable admin dashboard building blocks (server-safe, no client JS needed).
 
 import { Inbox } from "lucide-react";
+import type { Route } from "next";
+import Link from "next/link";
 import type { ReactNode } from "react";
 
 /* ---------- Stat card ---------- */
@@ -11,12 +13,15 @@ export function StatCard({
   sub,
   icon,
   accent = "purple",
+  href,
 }: {
   label: string;
   value: string;
   sub?: string;
   icon?: ReactNode;
   accent?: "purple" | "magenta" | "cyan" | "green" | "amber";
+  /** Optional link target — makes the whole card clickable. */
+  href?: string;
 }) {
   const accents: Record<string, string> = {
     purple: "from-brand-purple/15 to-brand-purple/5 text-brand-purple",
@@ -25,8 +30,12 @@ export function StatCard({
     green: "from-green-500/15 to-green-500/5 text-green-700",
     amber: "from-amber-500/15 to-amber-500/5 text-amber-700",
   };
-  return (
-    <div className="relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md">
+  const card = (
+    <div
+      className={`relative overflow-hidden rounded-2xl border bg-white p-5 shadow-sm transition-shadow hover:shadow-md ${
+        href ? "hover:ring-1 hover:ring-brand-purple/30" : ""
+      }`}
+    >
       <div
         className={`absolute -end-6 -top-6 h-24 w-24 rounded-full bg-gradient-to-br ${accents[accent]}`}
       />
@@ -38,6 +47,30 @@ export function StatCard({
         <div className="mt-2 text-2xl font-bold tracking-tight">{value}</div>
         {sub && <div className="mt-1 text-xs text-gray-400">{sub}</div>}
       </div>
+    </div>
+  );
+  return href ? <Link href={href as unknown as Route}>{card}</Link> : card;
+}
+
+/* ---------- Mini bar chart (server-rendered, no JS) ---------- */
+
+export type ChartBucket = { label: string; value: number; display: string };
+
+export function MiniBarChart({ buckets }: { buckets: ChartBucket[] }) {
+  const max = Math.max(1, ...buckets.map((b) => b.value));
+  return (
+    // Chronological left→right regardless of page direction.
+    <div dir="ltr" className="flex h-28 items-end gap-1.5 px-1">
+      {buckets.map((b) => (
+        <div key={b.label} className="flex flex-1 flex-col items-center gap-1">
+          <div
+            className="w-full rounded-t bg-brand-purple/60 transition-colors hover:bg-brand-purple"
+            style={{ height: `${Math.max(3, Math.round((b.value / max) * 100))}%` }}
+            title={`${b.label} — ${b.display}`}
+          />
+          <span className="text-[9px] leading-none text-gray-400">{b.label}</span>
+        </div>
+      ))}
     </div>
   );
 }

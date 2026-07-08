@@ -36,6 +36,10 @@ const adminFa = {
     sponsors: "حامیان",
     total: "کل",
     discounts: "تخفیف‌های اعمال‌شده",
+    today: "امروز",
+    thisMonth: "این ماه",
+    revenue14d: "درآمد ۱۴ روز اخیر",
+    recentOrders: "سفارش‌های اخیر",
   },
   cols: {
     customer: "مشتری",
