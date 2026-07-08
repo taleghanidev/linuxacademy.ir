@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDown, Loader2, Minus, Plus, X } from "lucide-react";
+import { ArrowDown, Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import NavBar from "@/components/NavBar";
@@ -25,28 +25,12 @@ interface SponsorProduct {
   image: string;
 }
 
-interface Feature {
-  id: number;
-  name: string;
-  platform: string;
-  type: string;
-  description: any[];
-  example_link: string | null;
-  media_format: string;
-  is_active: boolean;
-  packages: any[];
-}
-
 const Sponsorship = () => {
   const [products, setProducts] = useState<SponsorProduct[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, _setError] = useState(false);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [totals, setTotals] = useState<Record<number, number>>({});
-  const [features, setFeatures] = useState<Feature[]>([]);
-  const [selectedProductFeatures, setSelectedProductFeatures] = useState<Feature[]>([]);
-  const [showFeaturesModal, setShowFeaturesModal] = useState(false);
-  const [featuresLoading, setFeaturesLoading] = useState(false);
   const navigate = useNavigate();
   const { addItem } = useCart();
 
@@ -76,7 +60,6 @@ const Sponsorship = () => {
     });
     setQuantities(initialQuantities);
     setTotals(initialTotals);
-    setFeatures([]);
     setLoading(false);
     window.scrollTo(0, 0);
   }, []);
@@ -130,45 +113,6 @@ const Sponsorship = () => {
   const handleBuyNow = (product: SponsorProduct) => {
     addToCart(product);
     navigate("/cart");
-  };
-
-  const handleViewDetails = async (productId: number) => {
-    setFeaturesLoading(true);
-    setShowFeaturesModal(true);
-
-    // Filter features for this product
-    const productFeatures = features.filter((feature) =>
-      feature.packages.some((pkg) => pkg.id === productId),
-    );
-
-    // Features are already localized from the API call with locale parameter
-    setSelectedProductFeatures(productFeatures);
-    setFeaturesLoading(false);
-  };
-
-  const renderDescription = (description: any[]) => {
-    if (!description || !Array.isArray(description)) return null;
-
-    return description.map((block, index) => {
-      switch (block.type) {
-        case "paragraph":
-          return (
-            <p key={index} className="mb-3 text-gray-700">
-              {block.children?.map((child: any, _childIndex: number) => child.text || "").join("")}
-            </p>
-          );
-        case "heading": {
-          const HeadingTag = `h${block.level || 3}` as keyof JSX.IntrinsicElements;
-          return (
-            <HeadingTag key={index} className="font-semibold text-gray-900 mb-2 mt-4">
-              {block.children?.map((child: any, _childIndex: number) => child.text || "").join("")}
-            </HeadingTag>
-          );
-        }
-        default:
-          return null;
-      }
-    });
   };
 
   if (error) {
@@ -367,15 +311,7 @@ const Sponsorship = () => {
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4">
-                      <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-                        <Button
-                          onClick={() => handleViewDetails(product.id)}
-                          className="w-full sm:w-auto px-4 py-2.5 bg-brand-purple text-white rounded-md hover:bg-brand-purple/90 transition-colors text-sm"
-                        >
-                          {lang.products.details}
-                        </Button>
-                      </div>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-end gap-3 mt-4">
                       <Button
                         onClick={() => handleBuyNow(product)}
                         className="w-full sm:w-auto px-5 py-2.5 bg-brand-magenta text-white rounded-md hover:bg-brand-magenta/90 transition-colors"
@@ -418,95 +354,6 @@ const Sponsorship = () => {
           {lang.navigation.returnHome}
         </Link>
       </div>
-
-      {/* Features Modal */}
-      {showFeaturesModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex justify-between items-center">
-              <h3 className="text-2xl font-semibold text-gray-900">
-                {isFa ? "ویژگی‌های بسته" : "Package Features"}
-              </h3>
-              <button
-                onClick={() => setShowFeaturesModal(false)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="h-6 w-6" />
-              </button>
-            </div>
-
-            <div className="p-6">
-              {featuresLoading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="h-8 w-8 animate-spin text-brand-purple" />
-                </div>
-              ) : selectedProductFeatures.length > 0 ? (
-                <div className="space-y-6">
-                  {selectedProductFeatures.map((feature, index) => (
-                    <div
-                      key={feature.id}
-                      className={`p-6 bg-gray-50 rounded-xl ${index > 0 ? "border-t border-gray-200" : ""}`}
-                    >
-                      <div className="flex items-start justify-between mb-4">
-                        <div>
-                          <h4 className="text-xl font-semibold text-gray-900 mb-2">
-                            {feature.name}
-                          </h4>
-                          <div className="flex gap-2 mb-3">
-                            {feature.platform && (
-                              <span className="px-3 py-1 bg-brand-purple/10 text-brand-purple text-sm rounded-full">
-                                {feature.platform}
-                              </span>
-                            )}
-                            {feature.type && (
-                              <span className="px-3 py-1 bg-brand-magenta/10 text-brand-magenta text-sm rounded-full">
-                                {feature.type}
-                              </span>
-                            )}
-                            {feature.media_format && (
-                              <span className="px-3 py-1 bg-brand-cyan/10 text-brand-cyan text-sm rounded-full">
-                                {feature.media_format}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="prose prose-sm max-w-none">
-                        {renderDescription(feature.description)}
-                      </div>
-
-                      {feature.example_link && (
-                        <div className="mt-4">
-                          <a
-                            href={feature.example_link}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center text-brand-purple hover:underline"
-                          >
-                            {isFa ? "مشاهده نمونه" : "View Example"}
-                            <ArrowDown
-                              className={`h-4 w-4 ${isFa ? "mr-1 transform rotate-90" : "ml-1 transform -rotate-90"}`}
-                            />
-                          </a>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-gray-500">
-                    {isFa
-                      ? "هیچ ویژگی‌ای برای این بسته یافت نشد."
-                      : "No features found for this package."}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      )}
     </PageShell>
   );
 };
