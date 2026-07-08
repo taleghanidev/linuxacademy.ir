@@ -11,7 +11,8 @@ export async function GET() {
     const slots = await getFreeSlotIsos();
     return Response.json({ slots });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Availability lookup failed";
-    return Response.json({ error: message }, { status: 502 });
+    // Log the detail server-side; never leak internals to the client.
+    console.error("availability lookup failed:", err);
+    return Response.json({ error: "Availability lookup failed" }, { status: 502 });
   }
 }

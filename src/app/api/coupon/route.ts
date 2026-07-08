@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { evaluateCouponServer } from "@/lib/coupons";
+import { allowRequest, couponLimiter } from "@/lib/ratelimit";
 
 // Validate a coupon against the cart's lines so the cart can preview the
 // discount for admin-managed (DB) codes as well as static ones. The checkout
@@ -18,6 +19,10 @@ const schema = z.object({
 });
 
 export async function POST(request: Request) {
+  if (!(await allowRequest(couponLimiter, request))) {
+    return Response.json({ valid: false, reason: "rate_limited" }, { status: 429 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();

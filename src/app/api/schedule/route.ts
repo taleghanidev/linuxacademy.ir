@@ -6,6 +6,7 @@ import { customers, db, orderItems, orders } from "@/db";
 import { getFreeSlotIsos, invalidateBusyCache } from "@/lib/availability";
 import { notifySessionScheduled } from "@/lib/email";
 import { createEvent, isCalendarConfigured } from "@/lib/google-calendar";
+import { allowRequest, scheduleLimiter } from "@/lib/ratelimit";
 import { isSlotFree } from "@/lib/slots";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +61,9 @@ const bookSchema = z.object({
 
 // POST /api/schedule → book one session into the owner's Google Calendar.
 export async function POST(request: Request) {
+  if (!(await allowRequest(scheduleLimiter, request))) {
+    return Response.json({ error: "Too many requests" }, { status: 429 });
+  }
   if (!isCalendarConfigured()) {
     return Response.json({ error: "Calendar not configured" }, { status: 503 });
   }

@@ -19,6 +19,26 @@ export const checkoutLimiter = redis
     })
   : null;
 
+// 15 coupon validations per minute per IP (blocks code brute-forcing).
+export const couponLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(15, "1 m"),
+      prefix: "rl:coupon",
+      analytics: false,
+    })
+  : null;
+
+// 10 booking attempts per minute per IP (protects the Google Calendar API).
+export const scheduleLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(10, "1 m"),
+      prefix: "rl:schedule",
+      analytics: false,
+    })
+  : null;
+
 function clientIp(request: Request): string {
   const fwd = request.headers.get("x-forwarded-for");
   if (fwd) return fwd.split(",")[0].trim();
