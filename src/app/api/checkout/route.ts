@@ -1,9 +1,9 @@
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { evaluateCouponServer } from "@/lib/coupons";
 import { getPackage, getTier } from "@/config/products";
 import { db, orderItems, orders } from "@/db";
 import { siteUrl, upsertCustomer } from "@/lib/checkout";
+import { evaluateCouponServer } from "@/lib/coupons";
 import { allowRequest, checkoutLimiter } from "@/lib/ratelimit";
 import { zarinpalRequest } from "@/lib/zarinpal";
 
@@ -138,6 +138,20 @@ export async function POST(request: Request) {
     })),
   );
 
+  // Test mode: PAYMENT_MODE=mock skips the gateway entirely — the buyer is sent
+  // straight to our verify endpoint, which settles the order with a MOCK ref.
+  // Lets the whole purchase flow be exercised before Zarinpal credentials exist.
+  if (process.env.PAYMENT_MODE === "mock") {
+    const authority = `MOCK-${order.id}`;
+    await db
+      .update(orders)
+      .set({ authority, updatedAt: new Date() })
+      .where(eq(orders.id, order.id));
+    return Response.json({
+      startPayUrl: `${siteUrl()}/api/checkout/verify?Authority=${authority}&Status=OK`,
+    });
+  }
+
   try {
     const { authority, startPayUrl } = await zarinpalRequest({
       amount: total,
@@ -157,7 +171,8 @@ export async function POST(request: Request) {
       .update(orders)
       .set({ status: "FAILED", updatedAt: new Date() })
       .where(eq(orders.id, order.id));
-    const message = err instanceof Error ? err.message : "Payment init failed";
-    return Response.json({ error: message }, { status: 502 });
+    // Log details server-side; never leak gateway/internal messages to buyers.
+    console.error("payment init failed:", err);
+    return Response.json({ error: "Payment init failed" }, { status: 502 });
   }
 }
