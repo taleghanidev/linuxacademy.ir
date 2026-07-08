@@ -106,14 +106,21 @@ const Cart = () => {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error || "Checkout failed");
+        // Never surface the raw (English) API error — map to a localized message.
+        const localized =
+          res.status === 429
+            ? t.errors?.tooMany
+            : res.status === 400 && data.reason
+              ? t.errors?.invalidCoupon
+              : t.errors?.orderFailed;
+        setError(localized || t.errors?.orderFailed || "Order failed. Please try again.");
         setSubmitting(false);
         return;
       }
       clear();
       window.location.href = data.startPayUrl;
     } catch {
-      setError("Network error. Please try again.");
+      setError(t.errors?.network || "Network error. Please try again.");
       setSubmitting(false);
     }
   };
