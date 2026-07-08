@@ -3,6 +3,7 @@
 import {
   BadgePercent,
   CalendarClock,
+  Clock,
   LayoutDashboard,
   Megaphone,
   Receipt,
@@ -21,6 +22,7 @@ const NAV = [
   { href: "/admin/sponsors", key: "sponsors", Icon: Megaphone, exact: false },
   { href: "/admin/customers", key: "customers", Icon: Users, exact: false },
   { href: "/admin/coupons", key: "coupons", Icon: BadgePercent, exact: false },
+  { href: "/admin/schedule", key: "schedule", Icon: Clock, exact: false },
 ] as const;
 
 export default function AdminSidebar() {

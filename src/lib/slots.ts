@@ -2,14 +2,9 @@
 // Google Calendar busy blocks → bookable UTC slot instants.
 
 import { DateTime, Interval } from "luxon";
-import {
-  BOOKING_HORIZON_DAYS,
-  MIN_NOTICE_HOURS,
-  OWNER_TIMEZONE,
-  SLOT_MINUTES,
-  WEEKLY_HOURS,
-} from "@/config/schedule";
+import { OWNER_TIMEZONE, SLOT_MINUTES } from "@/config/schedule";
 import type { BusyBlock } from "@/lib/google-calendar";
+import type { ScheduleSettings } from "@/lib/schedule-settings";
 
 const WEEKDAY_NAMES = [
   "monday",
@@ -19,25 +14,25 @@ const WEEKDAY_NAMES = [
   "friday",
   "saturday",
   "sunday",
-];
+] as const;
 
-export function bookingWindow(): { fromIso: string; toIso: string } {
+export function bookingWindow(s: ScheduleSettings): { fromIso: string; toIso: string } {
   const now = DateTime.utc();
   return {
     fromIso: now.toISO() as string,
-    toIso: now.plus({ days: BOOKING_HORIZON_DAYS }).toISO() as string,
+    toIso: now.plus({ days: s.bookingHorizonDays }).toISO() as string,
   };
 }
 
 // All candidate slot starts (UTC ISO) inside the booking window.
-export function candidateSlots(): DateTime[] {
+export function candidateSlots(s: ScheduleSettings): DateTime[] {
   const slots: DateTime[] = [];
-  const earliest = DateTime.utc().plus({ hours: MIN_NOTICE_HOURS });
-  const horizon = DateTime.utc().plus({ days: BOOKING_HORIZON_DAYS });
+  const earliest = DateTime.utc().plus({ hours: s.minNoticeHours });
+  const horizon = DateTime.utc().plus({ days: s.bookingHorizonDays });
 
   let day = DateTime.now().setZone(OWNER_TIMEZONE).startOf("day");
   while (day < horizon.setZone(OWNER_TIMEZONE)) {
-    const ranges = WEEKLY_HOURS[WEEKDAY_NAMES[day.weekday - 1]] ?? [];
+    const ranges = s.weeklyHours[WEEKDAY_NAMES[day.weekday - 1]] ?? [];
     for (const range of ranges) {
       const [fh, fm] = range.from.split(":").map(Number);
       const [th, tm] = range.to.split(":").map(Number);

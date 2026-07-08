@@ -2,7 +2,8 @@
 // the old Redis setup) intersected with the weekly working hours.
 
 import { Redis } from "@upstash/redis";
-import { getBusyBlocks, type BusyBlock } from "@/lib/google-calendar";
+import { type BusyBlock, getBusyBlocks } from "@/lib/google-calendar";
+import { getScheduleSettings } from "@/lib/schedule-settings";
 import { bookingWindow, candidateSlots, filterFree } from "@/lib/slots";
 
 const CACHE_KEY = "gcal:busy";
@@ -15,7 +16,8 @@ function redis(): Redis | null {
 }
 
 export async function getFreeSlotIsos(skipCache = false): Promise<string[]> {
-  const { fromIso, toIso } = bookingWindow();
+  const settings = await getScheduleSettings();
+  const { fromIso, toIso } = bookingWindow(settings);
   const kv = redis();
 
   let busy: BusyBlock[] | null = null;
@@ -36,7 +38,7 @@ export async function getFreeSlotIsos(skipCache = false): Promise<string[]> {
       }
     }
   }
-  return filterFree(candidateSlots(), busy).map((s) => s.toISO() as string);
+  return filterFree(candidateSlots(settings), busy).map((s) => s.toISO() as string);
 }
 
 export async function invalidateBusyCache(): Promise<void> {

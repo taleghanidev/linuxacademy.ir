@@ -111,6 +111,14 @@ export const coupons = pgTable(
   (t) => [index("coupons_active_idx").on(t.active)],
 );
 
+// Small key-value store for admin-editable site settings (e.g. weekly
+// availability). Each key holds one JSON document; code merges over defaults.
+export const settings = pgTable("settings", {
+  key: text("key").primaryKey(),
+  value: jsonb("value").$type<Record<string, unknown>>().notNull(),
+  updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export type Customer = typeof customers.$inferSelect;
 export type Order = typeof orders.$inferSelect;
 export type OrderItem = typeof orderItems.$inferSelect;

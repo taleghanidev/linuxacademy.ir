@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/sponsors", key: "sponsors", exact: false },
   { href: "/admin/customers", key: "customers", exact: false },
   { href: "/admin/coupons", key: "coupons", exact: false },
+  { href: "/admin/schedule", key: "schedule", exact: false },
 ] as const;
 
 /** Horizontal scrollable nav for small screens (sidebar is hidden below lg). */
