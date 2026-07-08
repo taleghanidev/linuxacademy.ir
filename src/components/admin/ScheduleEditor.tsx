@@ -23,10 +23,22 @@ type Range = { from: string; to: string };
 const inputCls =
   "rounded-lg border border-gray-200 px-2 py-1.5 text-sm outline-none focus:border-brand-purple focus:ring-1 focus:ring-brand-purple";
 
+// Frequently relevant zones first, then the full IANA list.
+const COMMON_TIMEZONES = ["Australia/Sydney", "Asia/Tehran", "UTC"];
+const ALL_TIMEZONES: string[] = (() => {
+  try {
+    const all = Intl.supportedValuesOf("timeZone");
+    return [...COMMON_TIMEZONES, ...all.filter((z) => !COMMON_TIMEZONES.includes(z))];
+  } catch {
+    return COMMON_TIMEZONES;
+  }
+})();
+
 export default function ScheduleEditor({ initial }: { initial: ScheduleSettings }) {
   const [weekly, setWeekly] = useState<Record<string, Range[]>>(initial.weeklyHours);
   const [minNotice, setMinNotice] = useState(String(initial.minNoticeHours));
   const [horizon, setHorizon] = useState(String(initial.bookingHorizonDays));
+  const [timezone, setTimezone] = useState(initial.timezone);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
 
@@ -67,6 +79,7 @@ export default function ScheduleEditor({ initial }: { initial: ScheduleSettings 
           weeklyHours,
           minNoticeHours: Number(minNotice),
           bookingHorizonDays: Number(horizon),
+          timezone,
         }),
       });
       setMsg(res.ok ? { ok: true, text: t.saved } : { ok: false, text: t.error });
@@ -138,8 +151,24 @@ export default function ScheduleEditor({ initial }: { initial: ScheduleSettings 
         </ul>
       </div>
 
-      {/* Notice + horizon */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* Timezone + notice + horizon */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <label className="rounded-2xl border bg-white p-4 text-sm shadow-sm">
+          <span className="mb-1.5 block font-medium text-gray-700">{t.timezone}</span>
+          <select
+            value={timezone}
+            onChange={(e) => setTimezone(e.target.value)}
+            className={`${inputCls} w-full`}
+            dir="ltr"
+          >
+            {ALL_TIMEZONES.map((z) => (
+              <option key={z} value={z}>
+                {z}
+              </option>
+            ))}
+          </select>
+          <span className="mt-1.5 block text-xs text-gray-400">{t.timezoneHint}</span>
+        </label>
         <label className="rounded-2xl border bg-white p-4 text-sm shadow-sm">
           <span className="mb-1.5 block font-medium text-gray-700">{t.minNotice}</span>
           <input

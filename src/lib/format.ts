@@ -11,14 +11,15 @@ export function formatDate(d: Date | null): string {
   }).format(d);
 }
 
-// Date + time, shown in the business timezone (sessions are scheduled in Sydney).
-export function formatDateTime(d: Date | string | null): string {
+// Date + time in the business timezone (defaults to Sydney; the admin can
+// change the schedule timezone, which callers pass through).
+export function formatDateTime(d: Date | string | null, timeZone = "Australia/Sydney"): string {
   if (!d) return "—";
   const date = typeof d === "string" ? new Date(d) : d;
   if (Number.isNaN(date.getTime())) return "—";
   return new Intl.DateTimeFormat("en-GB", {
     dateStyle: "medium",
     timeStyle: "short",
-    timeZone: "Australia/Sydney",
+    timeZone,
   }).format(date);
 }

@@ -4,8 +4,22 @@
 
 import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { BOOKING_HORIZON_DAYS, MIN_NOTICE_HOURS, WEEKLY_HOURS } from "@/config/schedule";
+import {
+  BOOKING_HORIZON_DAYS,
+  MIN_NOTICE_HOURS,
+  OWNER_TIMEZONE,
+  WEEKLY_HOURS,
+} from "@/config/schedule";
 import { db, settings } from "@/db";
+
+function isValidTimezone(tz: string): boolean {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: tz });
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const SETTINGS_KEY = "schedule";
 
@@ -24,6 +38,9 @@ export const scheduleSettingsSchema = z.object({
   ),
   minNoticeHours: z.coerce.number().int().min(0).max(168),
   bookingHorizonDays: z.coerce.number().int().min(1).max(90),
+  // IANA timezone the weekly hours are expressed in. Defaulted so settings rows
+  // saved before this field existed keep parsing.
+  timezone: z.string().refine(isValidTimezone, "invalid timezone").default(OWNER_TIMEZONE),
 });
 
 export type ScheduleSettings = z.infer<typeof scheduleSettingsSchema>;
@@ -33,6 +50,7 @@ export function defaultScheduleSettings(): ScheduleSettings {
     weeklyHours: WEEKLY_HOURS,
     minNoticeHours: MIN_NOTICE_HOURS,
     bookingHorizonDays: BOOKING_HORIZON_DAYS,
+    timezone: OWNER_TIMEZONE,
   };
 }
 

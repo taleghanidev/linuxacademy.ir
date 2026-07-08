@@ -2,7 +2,7 @@
 // Google Calendar busy blocks → bookable UTC slot instants.
 
 import { DateTime, Interval } from "luxon";
-import { OWNER_TIMEZONE, SLOT_MINUTES } from "@/config/schedule";
+import { SLOT_MINUTES } from "@/config/schedule";
 import type { BusyBlock } from "@/lib/google-calendar";
 import type { ScheduleSettings } from "@/lib/schedule-settings";
 
@@ -30,8 +30,8 @@ export function candidateSlots(s: ScheduleSettings): DateTime[] {
   const earliest = DateTime.utc().plus({ hours: s.minNoticeHours });
   const horizon = DateTime.utc().plus({ days: s.bookingHorizonDays });
 
-  let day = DateTime.now().setZone(OWNER_TIMEZONE).startOf("day");
-  while (day < horizon.setZone(OWNER_TIMEZONE)) {
+  let day = DateTime.now().setZone(s.timezone).startOf("day");
+  while (day < horizon.setZone(s.timezone)) {
     const ranges = s.weeklyHours[WEEKDAY_NAMES[day.weekday - 1]] ?? [];
     for (const range of ranges) {
       const [fh, fm] = range.from.split(":").map(Number);

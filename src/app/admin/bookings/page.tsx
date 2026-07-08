@@ -2,6 +2,7 @@ import AdminTable from "@/components/admin/AdminTable";
 import { SectionCard } from "@/components/admin/ui";
 import adminFa from "@/language/fa/admin";
 import { formatDateTime } from "@/lib/format";
+import { getScheduleSettings } from "@/lib/schedule-settings";
 import { getBookings } from "../queries";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +17,8 @@ function noteOf(meta: unknown): string {
 }
 
 export default async function BookingsPage() {
-  const bookings = await getBookings();
+  const [bookings, schedule] = await Promise.all([getBookings(), getScheduleSettings()]);
+  const tz = schedule.timezone;
 
   const rows = bookings.map((b) => {
     const sessions = sessionsOf(b.meta)
@@ -32,8 +34,8 @@ export default async function BookingsPage() {
       package: b.label,
       sessions: `${sessions.length}/${b.quantity}`,
       nextSession: next ? next.toISOString() : "",
-      // Every scheduled session's date + time (Sydney tz), one per line.
-      bookingTimes: sessions.length ? sessions.map((d) => formatDateTime(d)).join("\n") : "—",
+      // Every scheduled session's date + time (business tz), one per line.
+      bookingTimes: sessions.length ? sessions.map((d) => formatDateTime(d, tz)).join("\n") : "—",
       note: noteOf(b.meta),
       amount: b.amount,
       status: b.status,
@@ -47,6 +49,7 @@ export default async function BookingsPage() {
       <SectionCard title={adminFa.pageTitles.bookings} description={adminFa.pageSubs.bookings}>
         <AdminTable
           rows={rows}
+          timeZone={tz}
           empty={adminFa.empty.bookings}
           statusKey="status"
           statusLabels={adminFa.status}

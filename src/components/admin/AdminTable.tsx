@@ -25,6 +25,8 @@ type Props = {
   statusLabels?: Record<string, string>;
   labels: { search: string; allStatuses: string };
   empty: string;
+  /** Timezone for date cells (defaults to the business default in formatDateTime). */
+  timeZone?: string;
 };
 
 type CustomerValue = { name?: string; email?: string; phone?: string };
@@ -54,6 +56,7 @@ export default function AdminTable({
   statusLabels,
   labels,
   empty,
+  timeZone,
 }: Props) {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("");
@@ -104,7 +107,9 @@ export default function AdminTable({
         return <span className="tabular-nums">{Number(value) || 0}</span>;
       case "date":
         return (
-          <span className="whitespace-nowrap text-gray-600">{formatDateTime(value as string)}</span>
+          <span className="whitespace-nowrap text-gray-600">
+            {formatDateTime(value as string, timeZone)}
+          </span>
         );
       case "status": {
         const s = String(value ?? "");
