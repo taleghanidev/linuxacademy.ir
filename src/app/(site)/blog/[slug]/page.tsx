@@ -34,7 +34,10 @@ export async function generateMetadata({
   return {
     title: `${fa.title} | لینوکس آکادمی`,
     description: fa.summary,
-    alternates: { canonical: url },
+    alternates: {
+      canonical: url,
+      types: { "text/markdown": `${url}.md` },
+    },
     openGraph: {
       title: fa.title,
       description: fa.summary,

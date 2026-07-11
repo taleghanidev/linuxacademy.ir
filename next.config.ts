@@ -20,7 +20,19 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   async headers() {
-    return [{ source: "/(.*)", headers: securityHeaders }];
+    return [
+      { source: "/(.*)", headers: securityHeaders },
+      // Cross-origin MCP discovery (the /api/mcp endpoint already sends CORS).
+      {
+        source: "/.well-known/mcp.json",
+        headers: [{ key: "Access-Control-Allow-Origin", value: "*" }],
+      },
+    ];
+  },
+  async rewrites() {
+    // Markdown mirrors for AI agents: /blog/<slug>.md → raw markdown route
+    // (noindex + canonical headers set in src/app/blog-md/[slug]/route.ts).
+    return [{ source: "/blog/:slug.md", destination: "/blog-md/:slug" }];
   },
 };
 

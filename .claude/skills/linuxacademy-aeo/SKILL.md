@@ -65,8 +65,17 @@ curl -X POST "https://ssl.bing.com/webmaster/api.svc/json/SubmitUrlBatch?apikey=
 
 - Per-page metadata + JSON-LD: `(site)/*/page.tsx` server wrappers, helpers in `src/lib/seo.ts`, `src/components/JsonLd.tsx`.
 - `/llms.txt`, `/llms-full.txt`: route handlers under `src/app/`.
-- MCP server: `src/app/api/mcp/route.ts` (+ `public/.well-known/mcp.json`); WebMCP: `src/components/WebMcpTools.tsx`.
+- MCP server: `src/app/api/mcp/route.ts` (+ `public/.well-known/mcp.json`, CORS header in next.config); WebMCP: `src/components/WebMcpTools.tsx`.
 - New static page? Add it to `src/app/sitemap.ts` AND `src/app/llms.txt/route.ts` (hand-maintained lists).
+
+## Markdown mirrors (.md twins for AI agents)
+
+Every article is also served as raw markdown at `/blog/<slug>.md` (rewrite in `next.config.ts` → `src/app/blog-md/[slug]/route.ts`, generated from content.ts — new articles get one automatically). Rules (memory: `md-mirror-ai-visibility`):
+
+- Every `.md` response: `X-Robots-Tag: noindex` + `Link: <html-page-url>; rel="canonical"` + `Content-Type: text/markdown; charset=utf-8`
+- Every HTML content page's head: `<link rel="alternate" type="text/markdown" href=".../page.md">` (via `alternates.types` in metadata)
+- robots.txt must allow everything — NEVER `Disallow /*.md` (blocked crawlers can't see the noindex header)
+- Do NOT put .md URLs in the sitemap or submit them for indexing — they're mirrors, not pages.
 
 ## Known issues (confirmed audit 2026-07-11, unfixed)
 
