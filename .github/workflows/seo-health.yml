@@ -1,0 +1,48 @@
+name: SEO health
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # every Monday 06:00 UTC
+  workflow_dispatch: # run on demand from the Actions tab
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run SEO health report
+        id: report
+        env:
+          GSC_CLIENT_ID: ${{ secrets.GSC_CLIENT_ID }}
+          GSC_CLIENT_SECRET: ${{ secrets.GSC_CLIENT_SECRET }}
+          GSC_REFRESH_TOKEN: ${{ secrets.GSC_REFRESH_TOKEN }}
+          BING_WEBMASTER_API_KEY: ${{ secrets.BING_WEBMASTER_API_KEY }}
+        run: |
+          set +e
+          python3 scripts/seo-health.py > report.md 2>&1
+          echo "exit_code=$?" >> "$GITHUB_OUTPUT"
+          cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-health-report
+          path: report.md
+
+      - name: Open issue on critical findings
+        if: steps.report.outputs.exit_code != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue create \
+            --title "SEO health: critical findings $(date -u +%Y-%m-%d)" \
+            --body-file report.md \
+            --label "seo" 2>/dev/null \
+          || gh issue create \
+            --title "SEO health: critical findings $(date -u +%Y-%m-%d)" \
+            --body-file report.md

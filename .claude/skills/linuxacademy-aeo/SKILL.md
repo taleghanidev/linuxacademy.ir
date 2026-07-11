@@ -40,7 +40,11 @@ git push "https://x-access-token:$(gh auth token)@github.com/taleghanidev/linuxa
 
 Vercel auto-deploys in ~1 min. Poll `https://linuxacademy.ir/sitemap.xml` (and the new slug) for 200 before submitting.
 
-## Submit indexing (after deploy)
+## Submit indexing — AUTOMATIC on every deploy
+
+`.github/workflows/submit-indexing.yml` runs on every push to main: waits until `/api/version` serves the pushed sha (Vercel deploy done), then submits the sitemap to Google Search Console (repo secrets `GSC_CLIENT_ID/SECRET/REFRESH_TOKEN`) and pings IndexNow. Nothing to run manually — check with `gh run list -R taleghanidev/linuxacademy.ir --workflow submit-indexing.yml`.
+
+Manual fallback (same scripts, local token file):
 
 ```
 python3 scripts/gsc-submit-sitemap.py    # Google: submits sitemap to sc-domain:linuxacademy.ir
