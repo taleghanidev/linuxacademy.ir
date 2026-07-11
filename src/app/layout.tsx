@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Vazirmatn } from "next/font/google";
+import WebMcpTools from "@/components/WebMcpTools";
 import "./globals.css";
 
 const vazirmatn = Vazirmatn({
@@ -36,7 +37,10 @@ export default function RootLayout({
           {/* eslint-disable-next-line @next/next/no-sync-scripts */}
           <script dangerouslySetInnerHTML={{ __html: setInitialDir }} />
         </head>
-        <body className="min-h-full flex flex-col font-sans">{children}</body>
+        <body className="min-h-full flex flex-col font-sans">
+          {children}
+          <WebMcpTools />
+        </body>
       </html>
     </ClerkProvider>
   );

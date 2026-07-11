@@ -1,0 +1,11 @@
+"use client";
+import dynamic from "next/dynamic";
+
+const Page = dynamic(() => import("@/spa/pages/BlogPost"), {
+  ssr: false,
+  loading: () => <div className="min-h-screen" />,
+});
+
+export default function BlogPostClient() {
+  return <Page />;
+}

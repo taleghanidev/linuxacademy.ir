@@ -1,10 +1,11 @@
-"use client";
-import dynamic from "next/dynamic";
+import type { Metadata } from "next";
+import { CartClient } from "../spa-clients";
 
-const Page = dynamic(() => import("@/spa/pages/Cart"), {
-  ssr: false,
-  loading: () => <div className="min-h-screen" />,
-});
+export const metadata: Metadata = {
+  title: "سبد خرید | لینوکس آکادمی",
+  robots: { index: false },
+};
+
 export default function Route() {
-  return <Page />;
+  return <CartClient />;
 }

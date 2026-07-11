@@ -1,0 +1,8 @@
+{
+  "name": "linuxacademy-ir",
+  "title": "Linux Academy (linuxacademy.ir)",
+  "description": "Read-only MCP server for Linux Academy: Persian/English consulting firm for DevOps, cloud infrastructure, and AI. Tools for listing services, reading blog articles, FAQs, and booking information.",
+  "endpoint": "https://linuxacademy.ir/api/mcp",
+  "transport": "streamable-http",
+  "capabilities": ["tools"]
+}

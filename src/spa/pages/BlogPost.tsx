@@ -4,6 +4,7 @@ import { ArrowDown } from "lucide-react";
 import moment from "moment-jalaali";
 import { useEffect, useState } from "react";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import NavBar from "@/components/NavBar";
 import { getArticleBySlug } from "@/config/content";
 import navBarEn from "@/language/en/components/navBar";
@@ -82,7 +83,7 @@ const BlogPost = () => {
       if (typeof block.body !== "string") return null;
       return (
         <div key={block.id} className="prose max-w-none my-6">
-          <ReactMarkdown>{block.body}</ReactMarkdown>
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{block.body}</ReactMarkdown>
         </div>
       );
     }

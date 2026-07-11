@@ -1,10 +1,11 @@
-"use client";
-import dynamic from "next/dynamic";
+import type { Metadata } from "next";
+import { BookClient } from "../spa-clients";
 
-const Page = dynamic(() => import("@/spa/pages/BookRedirect"), {
-  ssr: false,
-  loading: () => <div className="min-h-screen" />,
-});
+export const metadata: Metadata = {
+  title: "رزرو مشاوره | لینوکس آکادمی",
+  robots: { index: false },
+};
+
 export default function Route() {
-  return <Page />;
+  return <BookClient />;
 }
