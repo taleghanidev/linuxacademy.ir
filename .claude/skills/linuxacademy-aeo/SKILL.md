@@ -65,6 +65,17 @@ curl -X POST "https://ssl.bing.com/webmaster/api.svc/json/SubmitUrlBatch?apikey=
 - Bing Webmaster API key: local `.env` (`BING_WEBMASTER_API_KEY`), never commit.
 - IndexNow key: `public/4a0f117bb3f243fc693a9d891442217a.txt` (intentionally public) + same literal in `scripts/submit-indexnow.mjs` — rotate BOTH together.
 
+## SEO health monitoring (errors / warnings / suggestions)
+
+`scripts/seo-health.py` pulls a full health report from BOTH consoles + PageSpeed:
+- **Google**: sitemap errors/warnings, per-URL index inspection (verdict, coverage, canonical, rich-results issues), 28-day search performance with position/CTR opportunities.
+- **Bing**: crawl issues, crawl stats, query stats, rank & traffic, inbound links.
+- **PageSpeed** (opt-in `RUN_PSI=1`, slow ~1 min/page): SEO + performance audits.
+
+Run locally: `python3 scripts/seo-health.py` (markdown to stdout; exit 1 if any 🔴 critical). Automated: `.github/workflows/seo-health.yml` runs weekly (Mon 06:00 UTC) + manual (`gh workflow run seo-health.yml`), writes the report to the run summary, uploads it as an artifact, and opens a GitHub issue when critical findings appear. Same GSC_* / BING_WEBMASTER_API_KEY repo secrets.
+
+Signals: verdict FAIL or 5xx coverage → critical; canonical/rich-result errors → warnings; "Discovered - not indexed" and position 4-20 with impressions → suggestions.
+
 ## Machine-readable surfaces (keep in sync when structure changes)
 
 - Per-page metadata + JSON-LD: `(site)/*/page.tsx` server wrappers, helpers in `src/lib/seo.ts`, `src/components/JsonLd.tsx`.
