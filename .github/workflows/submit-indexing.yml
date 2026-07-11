@@ -1,0 +1,39 @@
+name: Submit indexing
+
+on:
+  push:
+    branches: [main]
+
+concurrency:
+  group: submit-indexing
+  cancel-in-progress: true
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Wait for Vercel to deploy this commit
+        run: |
+          for i in $(seq 1 40); do
+            live=$(curl -s -m 10 https://linuxacademy.ir/api/version | jq -r '.sha' 2>/dev/null || echo "")
+            if [ "$live" = "${{ github.sha }}" ]; then
+              echo "Commit ${{ github.sha }} is live."
+              exit 0
+            fi
+            echo "poll $i: live=$live"
+            sleep 15
+          done
+          echo "Timed out waiting for deploy of ${{ github.sha }}"
+          exit 1
+
+      - name: Submit sitemap to Google Search Console
+        env:
+          GSC_CLIENT_ID: ${{ secrets.GSC_CLIENT_ID }}
+          GSC_CLIENT_SECRET: ${{ secrets.GSC_CLIENT_SECRET }}
+          GSC_REFRESH_TOKEN: ${{ secrets.GSC_REFRESH_TOKEN }}
+        run: python3 scripts/gsc-submit-sitemap.py
+
+      - name: Ping IndexNow (Bing, Yandex, Seznam, Naver)
+        run: node scripts/submit-indexnow.mjs

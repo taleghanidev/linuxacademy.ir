@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Submit the sitemap to Google Search Console (stdlib only).
 
-Needs ~/.linuxacademy-gsc-token.json from scripts/gsc-auth.py.
+Credentials: env vars GSC_CLIENT_ID / GSC_CLIENT_SECRET / GSC_REFRESH_TOKEN
+(used by CI), falling back to ~/.linuxacademy-gsc-token.json from
+scripts/gsc-auth.py or scripts/google-auth-all.py.
 Run AFTER the site is deployed so /sitemap.xml is live:
     python3 scripts/gsc-submit-sitemap.py
 """
 
 import json
+import os
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -15,7 +18,14 @@ from pathlib import Path
 SITEMAP = "https://linuxacademy.ir/sitemap.xml"
 TOKEN_FILE = Path.home() / ".linuxacademy-gsc-token.json"
 
-tok = json.loads(TOKEN_FILE.read_text())
+if all(os.environ.get(f"GSC_{k}") for k in ("CLIENT_ID", "CLIENT_SECRET", "REFRESH_TOKEN")):
+    tok = {
+        "client_id": os.environ["GSC_CLIENT_ID"],
+        "client_secret": os.environ["GSC_CLIENT_SECRET"],
+        "refresh_token": os.environ["GSC_REFRESH_TOKEN"],
+    }
+else:
+    tok = json.loads(TOKEN_FILE.read_text())
 data = urllib.parse.urlencode({
     "client_id": tok["client_id"],
     "client_secret": tok["client_secret"],
