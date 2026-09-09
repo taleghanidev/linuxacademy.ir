@@ -77,7 +77,23 @@ export const BANK_TRANSFER = {
 } as const;
 
 /**
- * Where students outside Iran send the fee. Same warning as above: these are
+ * How students outside Iran pay. Wise and Revolut are the easy routes: each is
+ * just a link, and the page renders a QR code from it, so nothing here is an
+ * image that can go stale. Leave a link empty and that option is hidden.
+ *
+ * TODO: paste the real links. `wise` is your Wisetag link and `revolut` your
+ * revolut.me link; both are placeholders right now.
+ */
+export const INTERNATIONAL_PAYMENT = {
+  /** e.g. "https://wise.com/pay/me/yourwisetag" */
+  wise: "",
+  /** e.g. "https://revolut.me/yourusername" */
+  revolut: "",
+} as const;
+
+/**
+ * Bank details for students outside Iran, for anyone who would rather do a
+ * plain transfer than use Wise or Revolut. Same warning as above: these are
  * placeholders. Replace them with the real Australian account before taking
  * any international registration.
  */

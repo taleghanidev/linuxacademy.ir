@@ -3,10 +3,12 @@
 import { ArrowDown, Building2, Check, CheckCircle2, Copy, Landmark, Upload } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import PageShell, { useIsFa } from "@/components/PageShell";
+import PayLinkQr from "@/components/PayLinkQr";
 import {
   AI_AGENT_COURSE,
   BANK_TRANSFER,
   BANK_TRANSFER_INTL,
+  INTERNATIONAL_PAYMENT,
   type PayRegion,
 } from "@/config/courses";
 import courseRegisterEn from "@/language/en/pages/courseRegister";
@@ -210,6 +212,31 @@ const CourseRegister = () => {
             </div>
           ))}
         </div>
+
+        {/* ── Wise / Revolut (international only) ──────────────────────── */}
+        {intl && (INTERNATIONAL_PAYMENT.wise || INTERNATIONAL_PAYMENT.revolut) && (
+          <>
+            <h2 className="mb-2 text-xl font-bold">{lang.pay.heading}</h2>
+            <p className="mb-4 text-sm text-gray-600">{lang.pay.note}</p>
+            <div className="mb-6 grid gap-4 sm:grid-cols-2">
+              {INTERNATIONAL_PAYMENT.wise && (
+                <PayLinkQr
+                  href={INTERNATIONAL_PAYMENT.wise}
+                  label={lang.pay.wise}
+                  scanLabel={lang.pay.scan}
+                />
+              )}
+              {INTERNATIONAL_PAYMENT.revolut && (
+                <PayLinkQr
+                  href={INTERNATIONAL_PAYMENT.revolut}
+                  label={lang.pay.revolut}
+                  scanLabel={lang.pay.scan}
+                />
+              )}
+            </div>
+            <p className="mb-4 text-sm text-gray-600">{lang.pay.orBank}</p>
+          </>
+        )}
 
         {/* ── Bank details ─────────────────────────────────────────────── */}
         <h2 className="mb-2 flex items-center gap-2 text-xl font-bold">

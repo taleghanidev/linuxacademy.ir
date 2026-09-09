@@ -27,6 +27,15 @@ const courseRegisterEn = {
     ],
   },
 
+  pay: {
+    heading: "Ways to pay",
+    note: "Wise or Revolut is easiest. Scan the code, or tap the button.",
+    wise: "Pay with Wise",
+    revolut: "Pay with Revolut",
+    scan: "Scan with your phone",
+    orBank: "Or a plain bank transfer:",
+  },
+
   bank: {
     heading: "Account details",
     note: "Please transfer the exact amount to this account and keep your receipt.",
