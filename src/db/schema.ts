@@ -18,6 +18,11 @@ export const paymentStatus = pgEnum("payment_status", ["PENDING", "PAID", "FAILE
 export const itemType = pgEnum("item_type", ["booking", "sponsorship"]);
 export const couponType = pgEnum("coupon_type", ["percentage", "fixed"]);
 export const couponScope = pgEnum("coupon_scope", ["all", "booking", "sponsorship"]);
+export const enrollmentStatus = pgEnum("enrollment_status", [
+  "PENDING_REVIEW",
+  "CONFIRMED",
+  "REJECTED",
+]);
 
 // A buyer's contact details, captured at checkout (guest-friendly, keyed by email).
 export const customers = pgTable("customers", {
@@ -119,7 +124,43 @@ export const settings = pgTable("settings", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+// A course sign-up. The student transfers the fee to the bank account shown
+// on the registration page, then submits this form with a photo of the
+// receipt; an admin checks the receipt and confirms the seat. Deliberately
+// separate from `orders`, which is the Zarinpal card-payment path.
+export const courseEnrollments = pgTable(
+  "course_enrollments",
+  {
+    id: text("id")
+      .primaryKey()
+      .$defaultFn(() => createId()),
+    courseSlug: text("course_slug").notNull(),
+    fullName: text("full_name").notNull(),
+    email: text("email").notNull(),
+    phone: text("phone").notNull(),
+    note: text("note"),
+    // Fee quoted at the time of sign-up, in Toman, so later price changes
+    // do not rewrite what this person was asked to pay.
+    amount: integer("amount").notNull(),
+    // Vercel Blob URL of the uploaded receipt image, plus what we know of it.
+    receiptUrl: text("receipt_url").notNull(),
+    receiptName: text("receipt_name"),
+    receiptSize: integer("receipt_size"),
+    status: enrollmentStatus("status").notNull().default("PENDING_REVIEW"),
+    // Free-text note from whoever reviewed the receipt.
+    reviewNote: text("review_note"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("course_enrollments_course_idx").on(t.courseSlug),
+    index("course_enrollments_status_idx").on(t.status),
+    index("course_enrollments_email_idx").on(t.email),
+  ],
+);
+
 export type Customer = typeof customers.$inferSelect;
+export type CourseEnrollment = typeof courseEnrollments.$inferSelect;
 export type Order = typeof orders.$inferSelect;
 export type OrderItem = typeof orderItems.$inferSelect;
 export type CouponRow = typeof coupons.$inferSelect;

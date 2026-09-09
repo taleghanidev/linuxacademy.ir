@@ -286,20 +286,23 @@ const aiAgentCourseEn = {
     heading: "How to enroll",
     steps: [
       {
-        title: "Send the form",
-        desc: "Your name, how to reach you, and a line on what you want to build.",
+        title: "Transfer the fee",
+        desc: "Send the course fee to the account shown on the registration page.",
       },
       {
-        title: "A short conversation",
-        desc: "Fifteen minutes to make sure this course is right for you.",
+        title: "Fill the form and attach the receipt",
+        desc: "Give your name, email and phone, and attach a picture of your payment receipt.",
       },
       {
-        title: "Pay and hold your seat",
-        desc: "A payment link comes to you and your seat is reserved.",
+        title: "Seat confirmed",
+        desc: "We check the receipt and email you the confirmation.",
       },
-      { title: "Before session one", desc: "You get the setup guide and the session link." },
+      {
+        title: "Before session one",
+        desc: "You get the setup guide and the session link.",
+      },
     ],
-    cta: "Start enrolling",
+    cta: "Start registering",
     ctaNote: "Each cohort is capped at 12 people.",
   },
 

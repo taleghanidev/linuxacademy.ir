@@ -56,3 +56,14 @@ export async function allowRequest(limiter: Ratelimit | null, request: Request):
     return true;
   }
 }
+
+// 3 course sign-ups per minute per IP. Each one uploads a file, so this is
+// deliberately tighter than the checkout limit.
+export const enrollmentLimiter = redis
+  ? new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(3, "1 m"),
+      prefix: "rl:enrollment",
+      analytics: false,
+    })
+  : null;

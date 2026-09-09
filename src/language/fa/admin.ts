@@ -9,6 +9,7 @@ const adminFa = {
     orders: "سفارش‌ها",
     bookings: "رزروها",
     sponsors: "حامیان",
+    enrollments: "ثبت‌نام دوره‌ها",
     customers: "مشتریان",
     coupons: "کدهای تخفیف",
     schedule: "ساعات کاری",
@@ -20,6 +21,7 @@ const adminFa = {
     sponsors: "خریداران تبلیغات / اسپانسری",
     customers: "مشتریان",
     coupons: "کدهای تخفیف",
+    enrollments: "ثبت‌نام دوره‌ها",
   },
   pageSubs: {
     orders: "هر پرداخت، جدیدترین در ابتدا.",
@@ -27,6 +29,7 @@ const adminFa = {
     sponsors: "چه کسی چه سطحی خریده است.",
     customers: "فهرست مشتریان و مجموع خرید آن‌ها.",
     coupons: "کدهای تخفیفی که در سبد خرید پذیرفته می‌شوند.",
+    enrollments: "چه کسی در دوره‌ها ثبت‌نام کرده و رسید پرداختش چیست.",
   },
   stats: {
     revenue: "درآمد (پرداخت‌شده)",
@@ -58,6 +61,8 @@ const adminFa = {
     note: "یادداشت",
     tier: "سطح",
     qty: "تعداد",
+    course: "دوره",
+    receipt: "رسید پرداخت",
     email: "ایمیل",
     phone: "تلفن",
     orders: "سفارش‌ها",
@@ -78,6 +83,9 @@ const adminFa = {
     PENDING: "در انتظار",
     FAILED: "ناموفق",
     CANCELED: "لغو شده",
+    PENDING_REVIEW: "در انتظار بررسی",
+    CONFIRMED: "تأیید شده",
+    REJECTED: "رد شده",
   } as Record<string, string>,
   empty: {
     orders: "هنوز سفارشی ثبت نشده است.",
@@ -85,6 +93,7 @@ const adminFa = {
     sponsors: "هنوز حامی‌ای ثبت نشده است.",
     customers: "هنوز مشتری‌ای ثبت نشده است.",
     coupons: "هنوز کد تخفیفی ساخته نشده است.",
+    enrollments: "هنوز کسی در دوره‌ها ثبت‌نام نکرده است.",
   },
   schedule: {
     title: "ساعات کاری",

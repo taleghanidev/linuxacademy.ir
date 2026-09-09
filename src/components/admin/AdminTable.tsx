@@ -1,11 +1,11 @@
 "use client";
 
-import { ArrowDown, ArrowUp, ChevronsUpDown, Search } from "lucide-react";
+import { ArrowDown, ArrowUp, ChevronsUpDown, ExternalLink, Search } from "lucide-react";
 import { useMemo, useState } from "react";
 import { formatDateTime, formatRial } from "@/lib/format";
 import { EmptyState, StatusBadge } from "./ui";
 
-export type AdminColumnType = "text" | "money" | "date" | "status" | "customer" | "number";
+export type AdminColumnType = "text" | "money" | "date" | "status" | "customer" | "number" | "link";
 
 export type AdminColumn = {
   key: string;
@@ -30,6 +30,8 @@ type Props = {
 };
 
 type CustomerValue = { name?: string; email?: string; phone?: string };
+/** A "link" cell: the URL to open and the text to show for it. */
+type LinkValue = { href?: string; label?: string };
 
 function searchableText(value: unknown): string {
   if (value == null) return "";
@@ -114,6 +116,21 @@ export default function AdminTable({
       case "status": {
         const s = String(value ?? "");
         return <StatusBadge status={s} label={statusLabels?.[s]} />;
+      }
+      case "link": {
+        const l = (value ?? {}) as LinkValue;
+        if (!l.href) return <span className="text-gray-400">—</span>;
+        return (
+          <a
+            href={l.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 font-medium text-brand-purple hover:underline"
+          >
+            <ExternalLink className="h-3.5 w-3.5" />
+            {l.label ?? l.href}
+          </a>
+        );
       }
       case "customer": {
         const c = (value ?? {}) as CustomerValue;

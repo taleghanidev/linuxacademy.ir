@@ -17,6 +17,10 @@ export const AiAgentCourseClient = dynamic(() => import("@/spa/pages/AiAgentCour
   ssr: false,
   loading,
 });
+export const CourseRegisterClient = dynamic(() => import("@/spa/pages/CourseRegister"), {
+  ssr: false,
+  loading,
+});
 export const OrderThankYouClient = dynamic(() => import("@/spa/pages/OrderThankYou"), {
   ssr: false,
   loading,

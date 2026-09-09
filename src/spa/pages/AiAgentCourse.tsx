@@ -81,7 +81,7 @@ const AiAgentCourse = () => {
             <p className="text-lg text-gray-600 mb-8">{lang.subtitle}</p>
             <div className="flex flex-wrap gap-3">
               <Link
-                to="/contact"
+                to="/courses/ai-agent-course/register"
                 className="px-5 py-2.5 bg-brand-purple text-white rounded-md hover:bg-brand-purple-dark transition-colors font-medium"
               >
                 {lang.ctaEnroll}
@@ -309,7 +309,7 @@ const AiAgentCourse = () => {
                   <div className="text-3xl font-bold text-gray-900">{priceLabel}</div>
                 </div>
                 <Link
-                  to="/contact"
+                  to="/courses/ai-agent-course/register"
                   className="px-5 py-2.5 bg-brand-purple text-white rounded-md hover:bg-brand-purple-dark transition-colors font-medium"
                 >
                   {lang.ctaEnroll}
@@ -346,7 +346,7 @@ const AiAgentCourse = () => {
             </div>
             <div className="rounded-xl border border-gray-200 bg-white p-6 text-center shadow-sm">
               <Link
-                to="/contact"
+                to="/courses/ai-agent-course/register"
                 className="inline-block px-6 py-3 bg-brand-purple text-white rounded-md hover:bg-brand-purple-dark transition-colors font-medium"
               >
                 {lang.enroll.cta}

@@ -50,3 +50,21 @@ export const COURSES: Course[] = [AI_AGENT_COURSE];
 export function getCourse(slug: string): Course | undefined {
   return COURSES.find((c) => c.slug === slug);
 }
+
+/**
+ * Where students send the course fee. Registration is a bank transfer plus a
+ * photo of the receipt, so these values are shown verbatim on the page and
+ * people will type them into a banking app.
+ *
+ * TODO: replace every value below with the real account before announcing the
+ * course. They are placeholders, not a live account.
+ */
+export const BANK_TRANSFER = {
+  bankName: "بانک ملت",
+  accountHolder: "امیرمهدی طالقانی",
+  /** 16-digit card number, the usual way to transfer in Iran. */
+  cardNumber: "0000-0000-0000-0000",
+  /** IR + 24 digits. */
+  iban: "IR000000000000000000000000",
+  accountNumber: "0000000000",
+} as const;

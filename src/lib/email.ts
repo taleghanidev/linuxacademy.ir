@@ -79,3 +79,33 @@ export async function notifySessionScheduled(s: {
     </div>`,
   );
 }
+
+export async function notifyCourseEnrollment(e: {
+  id: string;
+  courseSlug: string;
+  fullName: string;
+  email: string;
+  phone: string;
+  amount: number;
+  receiptUrl: string;
+}): Promise<void> {
+  const row = (label: string, value: string) =>
+    `<tr><td style="padding:6px 12px;border-bottom:1px solid #eee;color:#666">${label}</td>` +
+    `<td style="padding:6px 12px;border-bottom:1px solid #eee"><b>${value}</b></td></tr>`;
+
+  await send(
+    `New course registration — ${e.fullName}`,
+    `<h2 style="font-family:system-ui">New course registration</h2>
+     <table style="font-family:system-ui;border-collapse:collapse;font-size:14px">
+       ${row("Course", e.courseSlug)}
+       ${row("Name", e.fullName)}
+       ${row("Email", e.email)}
+       ${row("Phone", e.phone)}
+       ${row("Fee quoted", fmt(e.amount))}
+     </table>
+     <p style="font-family:system-ui;font-size:14px">
+       <a href="${e.receiptUrl}">View the payment receipt</a><br>
+       Confirm or reject the seat in the admin area. Reference: ${e.id}
+     </p>`,
+  );
+}

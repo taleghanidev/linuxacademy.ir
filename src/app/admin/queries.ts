@@ -1,5 +1,5 @@
 import { desc, eq } from "drizzle-orm";
-import { coupons, customers, db, orderItems, orders } from "@/db";
+import { coupons, courseEnrollments, customers, db, orderItems, orders } from "@/db";
 
 // One row per order line, joined with its order (payment) and customer.
 function itemsByType(type: "booking" | "sponsorship") {
@@ -101,4 +101,10 @@ export async function getCustomers() {
 // All admin-managed discount codes, newest first.
 export function getCouponsList() {
   return db.select().from(coupons).orderBy(desc(coupons.createdAt));
+}
+
+// Every course registration, newest first. Each row carries the Vercel Blob
+// URL of the receipt the student uploaded.
+export function getCourseEnrollments() {
+  return db.select().from(courseEnrollments).orderBy(desc(courseEnrollments.createdAt));
 }
