@@ -31,8 +31,11 @@ export default function QuantityStepper({
   const atMin = value <= min;
   const atMax = value >= max;
 
+  // `btn-bare` opts out of the site-wide button chrome in globals.css, which
+  // would otherwise force a grey border and rounded-md corners onto these and
+  // draw a square box inside the round pill.
   const btn =
-    "flex h-8 w-8 items-center justify-center rounded-full text-gray-600 transition-colors hover:bg-brand-purple/10 hover:text-brand-purple disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-600";
+    "btn-bare flex h-8 w-8 items-center justify-center rounded-full border-0 bg-transparent text-gray-600 transition-colors hover:bg-brand-purple/10 hover:text-brand-purple disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-gray-600";
 
   return (
     <div

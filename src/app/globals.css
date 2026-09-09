@@ -101,16 +101,19 @@
 }
 
 @layer components {
-  button:not(nav button, .nav button, .menu button, [role='navigation'] button), 
-  .button:not(nav .button, .nav .button, .menu .button, [role='navigation'] .button), 
+  /* Site-wide button chrome. Add the `btn-bare` class to opt a button out —
+     needed for icon buttons that supply their own shape, e.g. the round
+     +/- controls in the cart, which this rule would otherwise square off. */
+  button:not(nav button, .nav button, .menu button, [role='navigation'] button, .btn-bare), 
+  .button:not(nav .button, .nav .button, .menu .button, [role='navigation'] .button, .btn-bare), 
   input[type='submit'], 
   input[type='button'] {
     @apply bg-white border border-gray-300 rounded-md text-black transition-colors duration-200;
     box-shadow: none;
   }
 
-  button:not(nav button, .nav button, .menu button, [role='navigation'] button):hover, 
-  .button:not(nav .button, .nav .button, .menu .button, [role='navigation'] .button):hover, 
+  button:not(nav button, .nav button, .menu button, [role='navigation'] button, .btn-bare):hover, 
+  .button:not(nav .button, .nav .button, .menu .button, [role='navigation'] .button, .btn-bare):hover, 
   input[type='submit']:hover, 
   input[type='button']:hover {
     @apply border-brand-purple text-black;
@@ -119,8 +122,8 @@
     transform: none;
   }
 
-  button:not(nav button, .nav button, .menu button, [role='navigation'] button):active, 
-  .button:not(nav .button, .nav .button, .menu button, [role='navigation'] .button):active, 
+  button:not(nav button, .nav button, .menu button, [role='navigation'] button, .btn-bare):active, 
+  .button:not(nav .button, .nav .button, .menu button, [role='navigation'] .button, .btn-bare):active, 
   input[type='submit']:active, 
   input[type='button']:active {
     @apply transform scale-95;

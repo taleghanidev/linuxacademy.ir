@@ -1,8 +1,8 @@
 const aiAgentCourseEn = {
   eyebrow: "Live online workshop",
-  title: "Building AI Agents",
+  title: "Folder-Based AI Agents",
   subtitle:
-    "From what an agent actually is to one you have built, tested and deployed. Eight Fridays, two live hours each, a small room, and a working project in your hands at the end.",
+    "A folder-based agent is the most modern and the easiest way to build an AI agent: one folder, a few text files, and an agent that works. Eight Fridays, two live hours each, a small room, and a working project in your hands at the end.",
   ctaEnroll: "Enroll in the course",
   ctaSyllabus: "See the syllabus",
   ctaConsult: "Talk before you enroll",
@@ -23,6 +23,7 @@ const aiAgentCourseEn = {
     heading: "What this is",
     paragraphs: [
       "Most AI training either stops at a tour of the tools or drops you straight into code that is hard to follow. This course takes a third route. First you understand what an agent is actually made of, then you build one with your own hands.",
+      "The method you learn is folder-based. An agent is nothing more than a folder holding a few text files: its instructions, its tools, its settings. No heavy framework, no intricate code. That simplicity is what makes it the most modern and the fastest way to build one, because a folder can be read, kept in git, reviewed and handed to someone else.",
       "Every concept arrives exactly when you need it for the next step. Tokens, context, the loop, tools, keys, webhooks and evals are never taught as vocabulary. Each one shows up at the point where you cannot go further without it.",
       "It is a workshop, not a lecture. You work on your own machine during the session, you ask questions and get answers, and in the final session we build a complete agent together and put it on a server.",
     ],
@@ -59,7 +60,6 @@ const aiAgentCourseEn = {
     notForItems: [
       "Are looking for a course on using a chatbot",
       "Want the mathematics of training a neural network from scratch",
-      "Cannot attend live and only want the videos",
     ],
   },
 
@@ -69,9 +69,7 @@ const aiAgentCourseEn = {
     items: [
       "A laptop with admin rights to install software (Linux, macOS, or Windows with WSL)",
       "A stable connection for the live session and access to services outside the country",
-      "Basic comfort in a terminal. If you have none, module 7 covers it from the ground up",
       "An account with one model provider and a small amount of credit for the exercises",
-      "Knowing a programming language helps but is not required",
     ],
   },
 
@@ -244,11 +242,7 @@ const aiAgentCourseEn = {
       "16 hours of live teaching in a room of no more than 12",
       "A recording of every session, with no expiry on access",
       "Slides and full notes for all 104 lessons",
-      "The exercise repository and the capstone project code",
       "A private question and answer channel for the eight weeks",
-      "A written review of your capstone project",
-      "A certificate of completion",
-      "Access to future updates of the material",
     ],
   },
 
@@ -340,11 +334,6 @@ const aiAgentCourseEn = {
         question: "Is model usage charged separately?",
         answer:
           "Yes. The exercises need a small amount of credit with one model provider, usually no more than a few hundred thousand Toman across the whole course. Module 9 teaches you exactly how to estimate and reduce that cost.",
-      },
-      {
-        question: "Is there a certificate?",
-        answer:
-          "Yes. Once you deliver the capstone project, a certificate of completion is issued in your name.",
       },
       {
         question: "What if the course is not for me?",
