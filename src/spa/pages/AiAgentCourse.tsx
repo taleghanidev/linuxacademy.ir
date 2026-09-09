@@ -7,7 +7,7 @@ import PageShell, { useIsFa } from "@/components/PageShell";
 import { AI_AGENT_COURSE } from "@/config/courses";
 import aiAgentCourseEn from "@/language/en/pages/aiAgentCourse";
 import aiAgentCourseFa from "@/language/fa/pages/aiAgentCourse";
-import { formatRial, formatTomanEn } from "@/lib/format";
+import { formatMoney, formatRial, formatTomanEn } from "@/lib/format";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
 
@@ -83,7 +83,9 @@ const AiAgentCourse = () => {
   const isFa = useIsFa();
   const lang = isFa ? aiAgentCourseFa : aiAgentCourseEn;
   const course = AI_AGENT_COURSE;
-  const price = isFa ? formatRial(course.price) : formatTomanEn(course.price);
+  // Two prices, always shown together: Toman inside Iran, AUD outside it.
+  const priceIran = isFa ? formatRial(course.price) : formatTomanEn(course.price);
+  const priceIntl = formatMoney(course.priceAud, "AUD");
 
   // Four facts, not eight. These are the ones that decide whether someone can
   // attend at all; the rest were noise.
@@ -116,7 +118,13 @@ const AiAgentCourse = () => {
             <p className="mb-8 text-lg leading-relaxed text-gray-600">{lang.subtitle}</p>
             <div className="flex flex-wrap items-center gap-4">
               {cta}
-              <span className="text-lg font-bold text-gray-900">{price}</span>
+              <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+                <span className="font-bold text-gray-900">{priceIran}</span>
+                <span>{lang.pricing.priceIran}</span>
+                <span className="h-1 w-1 rounded-full bg-gray-300" />
+                <span className="font-bold text-gray-900">{priceIntl}</span>
+                <span>{lang.pricing.priceIntl}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -236,10 +244,19 @@ const AiAgentCourse = () => {
             id="pricing"
             className="rounded-2xl border-2 border-brand-purple bg-white p-8 text-center"
           >
-            <div className="mb-1 text-sm font-medium text-brand-purple">
+            <div className="mb-4 text-sm font-medium text-brand-purple">
               {lang.pricing.priceLabel}
             </div>
-            <div className="mb-2 text-4xl font-bold text-gray-900">{price}</div>
+            <div className="mb-4 grid gap-4 sm:grid-cols-2">
+              <div className="rounded-xl bg-brand-tint p-5">
+                <div className="mb-1 text-xs text-gray-500">{lang.pricing.priceIran}</div>
+                <div className="text-3xl font-bold text-gray-900">{priceIran}</div>
+              </div>
+              <div className="rounded-xl bg-brand-tint p-5">
+                <div className="mb-1 text-xs text-gray-500">{lang.pricing.priceIntl}</div>
+                <div className="text-3xl font-bold text-gray-900">{priceIntl}</div>
+              </div>
+            </div>
             <p className="mb-6 text-sm text-gray-600">{lang.pricing.priceNote}</p>
             {cta}
             <p className="mt-4 text-sm text-gray-500">{lang.enroll.ctaNote}</p>

@@ -1,0 +1,2 @@
+ALTER TABLE "course_enrollments" ADD COLUMN IF NOT EXISTS "currency" text DEFAULT 'IRT' NOT NULL;--> statement-breakpoint
+ALTER TABLE "course_enrollments" ADD COLUMN IF NOT EXISTS "pay_region" text DEFAULT 'iran' NOT NULL;

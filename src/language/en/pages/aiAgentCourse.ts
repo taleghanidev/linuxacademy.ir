@@ -380,6 +380,8 @@ const aiAgentCourseEn = {
   pricing: {
     heading: "Price",
     priceLabel: "Full course fee",
+    priceIran: "Inside Iran",
+    priceIntl: "Outside Iran",
     priceNote: "A flat price for all 8 sessions, with nothing else to pay.",
     guaranteeHeading: "Refund guarantee",
     guarantee:

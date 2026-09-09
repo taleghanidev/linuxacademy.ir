@@ -139,9 +139,13 @@ export const courseEnrollments = pgTable(
     email: text("email").notNull(),
     phone: text("phone").notNull(),
     note: text("note"),
-    // Fee quoted at the time of sign-up, in Toman, so later price changes
-    // do not rewrite what this person was asked to pay.
+    // Fee quoted at the time of sign-up, so later price changes do not rewrite
+    // what this person was asked to pay. Toman for students inside Iran,
+    // Australian dollars for everyone else.
     amount: integer("amount").notNull(),
+    currency: text("currency").notNull().default("IRT"),
+    /** Which account they were told to pay: "iran" or "international". */
+    payRegion: text("pay_region").notNull().default("iran"),
     // Vercel Blob URL of the uploaded receipt image, plus what we know of it.
     receiptUrl: text("receipt_url").notNull(),
     receiptName: text("receipt_name"),

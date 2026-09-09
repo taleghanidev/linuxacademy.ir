@@ -3,11 +3,17 @@
 import { ArrowDown, Building2, Check, CheckCircle2, Copy, Landmark, Upload } from "lucide-react";
 import { useId, useRef, useState } from "react";
 import PageShell, { useIsFa } from "@/components/PageShell";
-import { AI_AGENT_COURSE, BANK_TRANSFER } from "@/config/courses";
+import {
+  AI_AGENT_COURSE,
+  BANK_TRANSFER,
+  BANK_TRANSFER_INTL,
+  type PayRegion,
+} from "@/config/courses";
 import courseRegisterEn from "@/language/en/pages/courseRegister";
 import courseRegisterFa from "@/language/fa/pages/courseRegister";
-import { formatRial, formatTomanEn } from "@/lib/format";
+import { formatMoney, formatRial, formatTomanEn } from "@/lib/format";
 import { Link } from "@/lib/router";
+import { cn } from "@/lib/utils";
 
 type Status = "idle" | "sending" | "done";
 
@@ -62,7 +68,15 @@ const CourseRegister = () => {
   const isFa = useIsFa();
   const lang = isFa ? courseRegisterFa : courseRegisterEn;
   const course = AI_AGENT_COURSE;
-  const fee = isFa ? formatRial(course.price) : formatTomanEn(course.price);
+  // Which account the student pays into decides both the fee and the details
+  // shown. The server recomputes the amount from this, never trusting the page.
+  const [region, setRegion] = useState<PayRegion>("iran");
+  const intl = region === "international";
+  const fee = intl
+    ? formatMoney(course.priceAud, "AUD")
+    : isFa
+      ? formatRial(course.price)
+      : formatTomanEn(course.price);
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +95,7 @@ const CourseRegister = () => {
 
     const form = new FormData(e.currentTarget);
     form.set("courseSlug", course.slug);
+    form.set("payRegion", region);
 
     // Check the file here too, so the common mistake never costs a round trip.
     const file = form.get("receipt");
@@ -154,6 +169,27 @@ const CourseRegister = () => {
         <h1 className="mb-3 text-3xl font-bold">{lang.title}</h1>
         <p className="mb-6 text-gray-600">{lang.intro}</p>
 
+        <h2 className="mb-1 text-lg font-bold">{lang.region.heading}</h2>
+        <p className="mb-3 text-sm text-gray-600">{lang.region.note}</p>
+        <div className="mb-6 grid gap-3 sm:grid-cols-2">
+          {(["iran", "international"] as PayRegion[]).map((r) => (
+            <button
+              key={r}
+              type="button"
+              onClick={() => setRegion(r)}
+              aria-pressed={region === r}
+              className={cn(
+                "btn-bare rounded-xl px-4 py-3 text-sm font-medium transition-colors",
+                region === r
+                  ? "border-2 border-brand-purple bg-brand-purple/5 text-brand-purple"
+                  : "border border-gray-200 bg-white text-gray-700 hover:border-brand-purple",
+              )}
+            >
+              {r === "iran" ? lang.region.iran : lang.region.international}
+            </button>
+          ))}
+        </div>
+
         <div className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-brand-purple bg-white p-5">
           <span className="text-sm font-medium text-brand-purple">{lang.feeLabel}</span>
           <span className="text-2xl font-bold text-gray-900">{fee}</span>
@@ -186,31 +222,35 @@ const CourseRegister = () => {
             <span className="text-sm text-gray-500">{lang.bank.bankName}</span>
             <span className="flex items-center gap-2 font-medium">
               <Building2 className="h-4 w-4 text-gray-400" />
-              {BANK_TRANSFER.bankName}
+              {intl ? BANK_TRANSFER_INTL.bankName : BANK_TRANSFER.bankName}
             </span>
           </div>
           <div className="flex items-center justify-between gap-3 border-b border-gray-100 py-2.5">
             <span className="text-sm text-gray-500">{lang.bank.accountHolder}</span>
-            <span className="font-medium">{BANK_TRANSFER.accountHolder}</span>
+            <span className="font-medium">
+              {intl ? BANK_TRANSFER_INTL.accountHolder : BANK_TRANSFER.accountHolder}
+            </span>
           </div>
-          <BankRow
-            label={lang.bank.cardNumber}
-            value={BANK_TRANSFER.cardNumber}
-            copyLabel={lang.bank.copy}
-            copiedLabel={lang.bank.copied}
-          />
-          <BankRow
-            label={lang.bank.iban}
-            value={BANK_TRANSFER.iban}
-            copyLabel={lang.bank.copy}
-            copiedLabel={lang.bank.copied}
-          />
-          <BankRow
-            label={lang.bank.accountNumber}
-            value={BANK_TRANSFER.accountNumber}
-            copyLabel={lang.bank.copy}
-            copiedLabel={lang.bank.copied}
-          />
+          {(intl
+            ? [
+                { label: lang.bank.bsb, value: BANK_TRANSFER_INTL.bsb },
+                { label: lang.bank.accountNumber, value: BANK_TRANSFER_INTL.accountNumber },
+                { label: lang.bank.swift, value: BANK_TRANSFER_INTL.swift },
+              ]
+            : [
+                { label: lang.bank.cardNumber, value: BANK_TRANSFER.cardNumber },
+                { label: lang.bank.iban, value: BANK_TRANSFER.iban },
+                { label: lang.bank.accountNumber, value: BANK_TRANSFER.accountNumber },
+              ]
+          ).map((row) => (
+            <BankRow
+              key={row.label}
+              label={row.label}
+              value={row.value}
+              copyLabel={lang.bank.copy}
+              copiedLabel={lang.bank.copied}
+            />
+          ))}
         </div>
 
         {/* ── Form ─────────────────────────────────────────────────────── */}

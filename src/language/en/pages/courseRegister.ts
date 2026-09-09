@@ -5,6 +5,13 @@ const courseRegisterEn = {
     "Registration takes three steps: transfer the fee to the account below, upload a picture of the receipt here, and we confirm your seat once we have checked it.",
   feeLabel: "Course fee",
 
+  region: {
+    heading: "Where are you based?",
+    note: "This sets your fee and the account you pay into.",
+    iran: "Inside Iran",
+    international: "Outside Iran",
+  },
+
   steps: {
     heading: "Three steps",
     items: [
@@ -28,6 +35,8 @@ const courseRegisterEn = {
     cardNumber: "Card number",
     iban: "IBAN",
     accountNumber: "Account number",
+    bsb: "BSB",
+    swift: "SWIFT code",
     copy: "Copy",
     copied: "Copied",
   },

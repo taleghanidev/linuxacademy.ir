@@ -87,6 +87,7 @@ export async function notifyCourseEnrollment(e: {
   email: string;
   phone: string;
   amount: number;
+  currency?: string;
   receiptUrl: string;
 }): Promise<void> {
   const row = (label: string, value: string) =>
@@ -101,7 +102,7 @@ export async function notifyCourseEnrollment(e: {
        ${row("Name", e.fullName)}
        ${row("Email", e.email)}
        ${row("Phone", e.phone)}
-       ${row("Fee quoted", fmt(e.amount))}
+       ${row("Fee quoted", e.currency === "AUD" ? `A$${e.amount.toLocaleString("en-US")}` : fmt(e.amount))}
      </table>
      <p style="font-family:system-ui;font-size:14px">
        <a href="${e.receiptUrl}">View the payment receipt</a><br>

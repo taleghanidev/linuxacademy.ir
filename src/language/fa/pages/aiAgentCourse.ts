@@ -375,6 +375,8 @@ const aiAgentCourseFa = {
   pricing: {
     heading: "هزینه دوره",
     priceLabel: "شهریه کامل دوره",
+    priceIran: "داخل ایران",
+    priceIntl: "خارج از ایران",
     priceNote: "قیمت مقطوع برای هر ۸ جلسه؛ بدون هزینه جانبی.",
     guaranteeHeading: "تضمین بازگشت وجه",
     guarantee:

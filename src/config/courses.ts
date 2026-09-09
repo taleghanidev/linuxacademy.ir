@@ -1,8 +1,10 @@
 // Static course catalog. Facts that must not drift between the Persian and
 // English copies (dates, price, capacity, counts) live here and are imported by
 // both language files, the JSON-LD builders and the course pages.
-// Courses are sold at a single flat price. Amounts are in Toman, matching
-// config/products.ts.
+// Courses are sold at one flat price, in two currencies: Toman for students
+// inside Iran (paid to the Iranian account) and Australian dollars for students
+// outside it (paid to the international account). Both are defined here so the
+// page, the form and the API can never disagree about what someone owes.
 
 export type Course = {
   slug: string;
@@ -22,8 +24,10 @@ export type Course = {
   lessons: number;
   /** Seats in one cohort. Small by design. */
   seats: number;
-  /** Flat course fee, in Toman. One price, no tiers. */
+  /** Fee for students inside Iran, in Toman. */
   price: number;
+  /** Fee for students outside Iran, in Australian dollars. */
+  priceAud: number;
   language: "fa";
   level: "beginner-to-intermediate";
 };
@@ -40,7 +44,8 @@ export const AI_AGENT_COURSE: Course = {
   modules: 12,
   lessons: 104,
   seats: 12,
-  price: 4_500_000,
+  price: 4_900_000,
+  priceAud: 100,
   language: "fa",
   level: "beginner-to-intermediate",
 };
@@ -59,6 +64,8 @@ export function getCourse(slug: string): Course | undefined {
  * TODO: replace every value below with the real account before announcing the
  * course. They are placeholders, not a live account.
  */
+export type PayRegion = "iran" | "international";
+
 export const BANK_TRANSFER = {
   bankName: "بانک ملت",
   accountHolder: "امیرمهدی طالقانی",
@@ -67,4 +74,19 @@ export const BANK_TRANSFER = {
   /** IR + 24 digits. */
   iban: "IR000000000000000000000000",
   accountNumber: "0000000000",
+} as const;
+
+/**
+ * Where students outside Iran send the fee. Same warning as above: these are
+ * placeholders. Replace them with the real Australian account before taking
+ * any international registration.
+ */
+export const BANK_TRANSFER_INTL = {
+  bankName: "TODO Bank",
+  accountHolder: "TODO Account Holder",
+  /** Australian BSB, 6 digits. */
+  bsb: "000-000",
+  accountNumber: "00000000",
+  /** For transfers from outside Australia. */
+  swift: "TODOAU0S",
 } as const;

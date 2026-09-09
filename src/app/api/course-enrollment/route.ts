@@ -1,6 +1,6 @@
 import { put } from "@vercel/blob";
 import { z } from "zod";
-import { getCourse } from "@/config/courses";
+import { getCourse, type PayRegion } from "@/config/courses";
 import { courseEnrollments, db } from "@/db";
 import { notifyCourseEnrollment } from "@/lib/email";
 import { allowRequest, enrollmentLimiter } from "@/lib/ratelimit";
@@ -27,6 +27,8 @@ const fieldsSchema = z.object({
     .max(20)
     .regex(/^[+\d][\d\s()-]{7,19}$/, "invalid_phone"),
   note: z.string().trim().max(1000).optional().or(z.literal("")),
+  // Which account they were shown; decides the currency and the amount owed.
+  payRegion: z.enum(["iran", "international"]).catch("iran"),
 });
 
 function fail(error: string, status: number) {
@@ -57,15 +59,20 @@ export async function POST(request: Request) {
     email: str("email"),
     phone: str("phone"),
     note: str("note"),
+    payRegion: str("payRegion"),
   });
   if (!parsed.success) {
     return fail(parsed.error.issues[0]?.message ?? "invalid_fields", 400);
   }
-  const { courseSlug, fullName, email, phone, note } = parsed.data;
+  const { courseSlug, fullName, email, phone, note, payRegion } = parsed.data;
 
   // The price is taken from the server-side catalogue, never from the client.
+  // The client only says which region it was shown; the amount comes from here.
   const course = getCourse(courseSlug);
   if (!course) return fail("unknown_course", 400);
+  const region: PayRegion = payRegion;
+  const amount = region === "international" ? course.priceAud : course.price;
+  const currency = region === "international" ? "AUD" : "IRT";
 
   const receipt = form.get("receipt");
   if (!(receipt instanceof File) || receipt.size === 0) return fail("receipt_required", 400);
@@ -103,7 +110,9 @@ export async function POST(request: Request) {
         email,
         phone,
         note: note || null,
-        amount: course.price,
+        amount,
+        currency,
+        payRegion: region,
         receiptUrl,
         receiptName: receipt.name.slice(0, 200),
         receiptSize: receipt.size,
@@ -122,7 +131,8 @@ export async function POST(request: Request) {
     fullName,
     email,
     phone,
-    amount: course.price,
+    amount,
+    currency,
     receiptUrl,
   }).catch((err) => console.error("Enrollment email failed:", err));
 
