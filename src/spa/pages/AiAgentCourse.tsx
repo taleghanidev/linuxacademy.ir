@@ -20,14 +20,19 @@ type Module = {
   lessonList?: string[];
 };
 
-/**
- * One syllabus module. Collapsed it is a single line, so all twelve fit on one
- * screen; expanded it lists that module's lessons. With 104 lessons in total,
- * printing them all at once is what made this page unreadable.
- */
+/** The claim of the course, shown rather than asserted. */
+const AGENT_FOLDER: Array<{ prefix: string; name: string; note?: string; dir?: boolean }> = [
+  { prefix: "", name: "my-agent/", dir: true },
+  { prefix: "├── ", name: "agent.md", note: "what it should do" },
+  { prefix: "├── ", name: "tools/", dir: true },
+  { prefix: "│   ├── ", name: "search.md", note: "a tool it can call" },
+  { prefix: "│   └── ", name: "send-email.md", note: "another one" },
+  { prefix: "└── ", name: ".env", note: "keys, never committed" },
+];
+
+/** Collapsed module row; opens to its lessons. */
 function ModuleRow({ m, isFa }: { m: Module; isFa: boolean }) {
   const [open, setOpen] = useState(false);
-
   return (
     <div className="overflow-hidden rounded-xl border border-gray-200 bg-white">
       <button
@@ -54,7 +59,6 @@ function ModuleRow({ m, isFa }: { m: Module; isFa: boolean }) {
           )}
         />
       </button>
-
       <div
         className="grid transition-[grid-template-rows] duration-300 ease-in-out"
         style={{ gridTemplateRows: open ? "1fr" : "0fr" }}
@@ -83,12 +87,9 @@ const AiAgentCourse = () => {
   const isFa = useIsFa();
   const lang = isFa ? aiAgentCourseFa : aiAgentCourseEn;
   const course = AI_AGENT_COURSE;
-  // Two prices, always shown together: Toman inside Iran, AUD outside it.
   const priceIran = isFa ? formatRial(course.price) : formatTomanEn(course.price);
   const priceIntl = formatMoney(course.priceAud, "AUD");
 
-  // Four facts, not eight. These are the ones that decide whether someone can
-  // attend at all; the rest were noise.
   const facts = [
     { icon: Calendar, ...lang.quickFacts.when },
     { icon: Clock, ...lang.quickFacts.duration },
@@ -96,10 +97,13 @@ const AiAgentCourse = () => {
     { icon: Users, ...lang.quickFacts.seats },
   ];
 
-  const cta = (
+  const cta = (size: "lg" | "md" = "md") => (
     <Link
       to="/courses/ai-agent-course/register"
-      className="inline-block rounded-lg bg-brand-purple px-6 py-3 font-medium text-white transition-colors hover:bg-brand-purple-dark"
+      className={cn(
+        "inline-block rounded-lg bg-brand-purple font-medium text-white transition-colors hover:bg-brand-purple-dark",
+        size === "lg" ? "px-7 py-3.5 text-lg" : "px-6 py-3",
+      )}
     >
       {lang.ctaEnroll}
     </Link>
@@ -107,24 +111,60 @@ const AiAgentCourse = () => {
 
   return (
     <PageShell container={false}>
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <header className="border-b border-gray-100 bg-gradient-to-b from-brand-tint to-gray-50 pt-28 pb-12">
+      {/* ── Hero: the promise, and the proof beside it ───────────────────── */}
+      <header className="border-b border-gray-100 bg-gradient-to-b from-brand-tint to-white pt-28 pb-16">
         <div className="container mx-auto">
-          <div className="max-w-2xl">
-            <span className="mb-4 inline-block rounded-full bg-brand-purple/10 px-3 py-1 text-sm font-medium text-brand-purple">
-              {lang.eyebrow}
-            </span>
-            <h1 className="mb-4 text-3xl font-bold leading-tight md:text-4xl">{lang.title}</h1>
-            <p className="mb-8 text-lg leading-relaxed text-gray-600">{lang.subtitle}</p>
-            <div className="flex flex-wrap items-center gap-4">
-              {cta}
-              <span className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-600">
+          <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_1fr]">
+            <div>
+              <span className="mb-5 inline-block rounded-full bg-brand-purple/10 px-3 py-1 text-sm font-medium text-brand-purple">
+                {lang.eyebrow}
+              </span>
+              <h1 className="mb-5 text-4xl font-bold leading-[1.15] md:text-5xl">{lang.title}</h1>
+              <p className="mb-8 max-w-xl text-xl leading-relaxed text-gray-600">{lang.subtitle}</p>
+              <div className="mb-6 flex flex-wrap items-center gap-4">
+                {cta("lg")}
+                <a
+                  href="#curriculum"
+                  className="text-brand-purple underline-offset-4 hover:underline"
+                >
+                  {lang.ctaSyllabus}
+                </a>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
                 <span className="font-bold text-gray-900">{priceIran}</span>
                 <span>{lang.pricing.priceIran}</span>
                 <span className="h-1 w-1 rounded-full bg-gray-300" />
                 <span className="font-bold text-gray-900">{priceIntl}</span>
                 <span>{lang.pricing.priceIntl}</span>
-              </span>
+              </div>
+            </div>
+
+            {/* the folder, shown not claimed */}
+            <div dir="ltr" className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+              <div className="mb-4 flex gap-1.5">
+                <span className="h-3 w-3 rounded-full bg-red-400" />
+                <span className="h-3 w-3 rounded-full bg-yellow-400" />
+                <span className="h-3 w-3 rounded-full bg-green-400" />
+              </div>
+              <pre
+                // A file tree only reads correctly left to right; the page
+                // around it is RTL, so force both direction and alignment.
+                style={{ direction: "ltr", textAlign: "left" }}
+                className="overflow-x-auto font-mono text-sm leading-7 text-gray-800"
+              >
+                {AGENT_FOLDER.map((row) => (
+                  <div key={row.name} className="whitespace-pre">
+                    <span className="text-gray-300">{row.prefix}</span>
+                    <span className={row.dir ? "font-semibold text-brand-purple" : ""}>
+                      {row.name}
+                    </span>
+                    {row.note && <span className="text-gray-400">{`   # ${row.note}`}</span>}
+                  </div>
+                ))}
+              </pre>
+              <p dir={isFa ? "rtl" : "ltr"} className="mt-4 text-xs text-gray-500">
+                {lang.proof.caption}
+              </p>
             </div>
           </div>
         </div>
@@ -147,22 +187,20 @@ const AiAgentCourse = () => {
         </div>
       </div>
 
-      <div className="container mx-auto py-14">
-        <div className="mx-auto max-w-3xl space-y-16">
-          {/* ── What this is ───────────────────────────────────────────── */}
-          <section>
-            <h2 className="mb-4 text-2xl font-bold">{lang.overview.heading}</h2>
-            <div className="space-y-4 text-lg leading-relaxed text-gray-700">
-              {lang.overview.paragraphs.map((p) => (
-                <p key={p.slice(0, 24)}>{p}</p>
-              ))}
-            </div>
-          </section>
+      {/* ── Why a folder ─────────────────────────────────────────────────── */}
+      <section className="bg-brand-tint py-16">
+        <div className="container mx-auto max-w-3xl">
+          <h2 className="mb-4 text-3xl font-bold">{lang.proof.heading}</h2>
+          <p className="text-lg leading-relaxed text-gray-700">{lang.proof.body}</p>
+        </div>
+      </section>
 
+      <div className="container mx-auto max-w-3xl py-16">
+        <div className="space-y-16">
           {/* ── Outcomes ───────────────────────────────────────────────── */}
           <section>
-            <h2 className="mb-5 text-2xl font-bold">{lang.outcomes.heading}</h2>
-            <ul className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+            <h2 className="mb-6 text-3xl font-bold">{lang.outcomes.heading}</h2>
+            <ul className="grid gap-x-8 gap-y-3.5 sm:grid-cols-2">
               {lang.outcomes.items.map((item) => (
                 <li key={item} className="flex gap-2.5 text-gray-700">
                   <Check className="mt-1 h-4 w-4 shrink-0 text-brand-purple" />
@@ -172,10 +210,23 @@ const AiAgentCourse = () => {
             </ul>
           </section>
 
+          {/* ── How sessions run ───────────────────────────────────────── */}
+          <section>
+            <h2 className="mb-6 text-3xl font-bold">{lang.format.heading}</h2>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {lang.format.items.map((f) => (
+                <div key={f.title} className="rounded-xl border border-gray-200 bg-white p-5">
+                  <h3 className="mb-1.5 font-semibold text-gray-900">{f.title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-600">{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          </section>
+
           {/* ── Syllabus ───────────────────────────────────────────────── */}
           <section id="curriculum">
-            <h2 className="mb-2 text-2xl font-bold">{lang.curriculum.heading}</h2>
-            <p className="mb-5 text-gray-600">{lang.curriculum.note}</p>
+            <h2 className="mb-2 text-3xl font-bold">{lang.curriculum.heading}</h2>
+            <p className="mb-6 text-gray-600">{lang.curriculum.note}</p>
             <div className="space-y-2">
               {(lang.curriculum.modules as Module[]).map((m) => (
                 <ModuleRow key={m.n} m={m} isFa={isFa} />
@@ -185,8 +236,8 @@ const AiAgentCourse = () => {
 
           {/* ── Who it is for ──────────────────────────────────────────── */}
           <section>
-            <h2 className="mb-5 text-2xl font-bold">{lang.audience.heading}</h2>
-            <ul className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
+            <h2 className="mb-6 text-3xl font-bold">{lang.audience.heading}</h2>
+            <ul className="mb-8 grid gap-x-8 gap-y-3.5 sm:grid-cols-2">
               {lang.audience.forItems.map((item) => (
                 <li key={item} className="flex gap-2.5 text-gray-700">
                   <Check className="mt-1 h-4 w-4 shrink-0 text-brand-purple" />
@@ -194,6 +245,19 @@ const AiAgentCourse = () => {
                 </li>
               ))}
             </ul>
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-5">
+              <h3 className="mb-3 text-sm font-semibold text-gray-700">
+                {lang.audience.notForHeading}
+              </h3>
+              <ul className="space-y-2">
+                {lang.audience.notForItems.map((item) => (
+                  <li key={item} className="flex gap-2.5 text-sm text-gray-600">
+                    <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-gray-400" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           </section>
 
           {/* ── Included + tools ───────────────────────────────────────── */}
@@ -238,16 +302,17 @@ const AiAgentCourse = () => {
               <p className="text-sm leading-relaxed text-gray-700">{lang.instructor.bio}</p>
             </div>
           </section>
+        </div>
+      </div>
 
-          {/* ── Price + CTA ────────────────────────────────────────────── */}
-          <section
-            id="pricing"
-            className="rounded-2xl border-2 border-brand-purple bg-white p-8 text-center"
-          >
-            <div className="mb-4 text-sm font-medium text-brand-purple">
+      {/* ── Price + CTA ──────────────────────────────────────────────────── */}
+      <section id="pricing" className="bg-brand-tint py-16">
+        <div className="container mx-auto max-w-3xl">
+          <div className="rounded-2xl border-2 border-brand-purple bg-white p-8 text-center">
+            <div className="mb-5 text-sm font-medium text-brand-purple">
               {lang.pricing.priceLabel}
             </div>
-            <div className="mb-4 grid gap-4 sm:grid-cols-2">
+            <div className="mb-5 grid gap-4 sm:grid-cols-2">
               <div className="rounded-xl bg-brand-tint p-5">
                 <div className="mb-1 text-xs text-gray-500">{lang.pricing.priceIran}</div>
                 <div className="text-3xl font-bold text-gray-900">{priceIran}</div>
@@ -258,22 +323,22 @@ const AiAgentCourse = () => {
               </div>
             </div>
             <p className="mb-6 text-sm text-gray-600">{lang.pricing.priceNote}</p>
-            {cta}
+            {cta("lg")}
             <p className="mt-4 text-sm text-gray-500">{lang.enroll.ctaNote}</p>
-          </section>
-
-          {/* ── FAQ ────────────────────────────────────────────────────── */}
-          <section>
-            <h2 className="mb-5 text-2xl font-bold">{lang.faq.heading}</h2>
-            <FaqAccordion
-              items={lang.faq.items.map((f, idx) => ({
-                id: idx,
-                question: f.question,
-                answer: f.answer,
-              }))}
-            />
-          </section>
+          </div>
         </div>
+      </section>
+
+      {/* ── FAQ ──────────────────────────────────────────────────────────── */}
+      <div className="container mx-auto max-w-3xl py-16">
+        <h2 className="mb-6 text-3xl font-bold">{lang.faq.heading}</h2>
+        <FaqAccordion
+          items={lang.faq.items.map((f, idx) => ({
+            id: idx,
+            question: f.question,
+            answer: f.answer,
+          }))}
+        />
       </div>
     </PageShell>
   );

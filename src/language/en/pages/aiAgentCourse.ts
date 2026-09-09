@@ -1,10 +1,38 @@
 const aiAgentCourseEn = {
   eyebrow: "Live online workshop",
-  title: "Folder-Based AI Agents",
+  title: "Build an AI agent, from scratch",
   subtitle:
-    "We are going to learn how to build an agent together. The simplest way is a folder with a few text files in it, and that is genuinely all. Eight Fridays, two hours each, a small group, and an agent you built yourself at the end.",
+    "Eight Fridays, two hours each. When the last session ends you have an agent you built yourself, running on a server.",
   ctaEnroll: "Enroll in the course",
   ctaSyllabus: "See the syllabus",
+
+  proof: {
+    heading: "This is genuinely all an agent is",
+    body: "No framework, no classes, no intricate code. A folder with a few text files: one says what the agent should do, the others define its tools, and the keys sit somewhere safe. You can keep that in git, review it, and hand it to someone else.",
+    caption: "The structure of a real agent. There is nothing more to it.",
+  },
+
+  format: {
+    heading: "How the sessions run",
+    items: [
+      {
+        title: "Live and two-way",
+        desc: "Nothing is pre-recorded. When you have a question you ask it there and then.",
+      },
+      {
+        title: "On your own machine",
+        desc: "Everything you see, you run on your own laptop in the same session.",
+      },
+      {
+        title: "A small group",
+        desc: "Places are limited so there is time for everyone's questions.",
+      },
+      {
+        title: "Every session recorded",
+        desc: "Miss one, or want to go back over it, and the recording is there.",
+      },
+    ],
+  },
   ctaConsult: "Talk before you enroll",
 
   quickFacts: {
