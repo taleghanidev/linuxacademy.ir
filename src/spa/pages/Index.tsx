@@ -9,8 +9,7 @@ import { GlobalContext } from "@/components/GlobalContext";
 import NavBar from "@/components/NavBar";
 import PageShell from "@/components/PageShell";
 import ServiceCard from "@/components/ServiceCard";
-import SponsorLogo from "@/components/SponsorLogo";
-import { getArticles, getFaqs, getPositions, getSponsors } from "@/config/content";
+import { getArticles, getFaqs } from "@/config/content";
 import contactFormEn from "@/language/en/components/contactForm";
 import navBarEn from "@/language/en/components/navBar";
 import serviceCardEn from "@/language/en/components/serviceCard";
@@ -74,11 +73,9 @@ const CookieConsent: React.FC = () => {
 const Index: React.FC<IndexProps> = () => {
   const language: any = document.documentElement.dir === "rtl" ? faIndex : enIndex;
   const [isVisible, setIsVisible] = useState(false);
-  const [sponsors, setSponsors] = useState([]);
   const [articles, setArticles] = useState([]);
   const [faqs, setFaqs] = useState([]);
   const [_about, _setAbout] = useState("");
-  const [positions, setPositions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, _setError] = useState(false);
   const { hourlyRate, heroImage, aboutImage } = useContext(GlobalContext);
@@ -93,8 +90,6 @@ const Index: React.FC<IndexProps> = () => {
     // Content is static now (no Strapi).
     setArticles(getArticles() as any);
     setFaqs(getFaqs() as any);
-    setSponsors(getSponsors() as any);
-    setPositions(getPositions() as any);
     setLoading(false);
     setIsVisible(true);
   }, []);
@@ -215,17 +210,6 @@ const Index: React.FC<IndexProps> = () => {
             </div>
             <div className="text-center mt-10">
               <div className="h-10 w-40 bg-gray-200 rounded mx-auto" />
-            </div>
-          </div>
-        </section>
-        {/* Sponsors Section Skeleton */}
-        <section className="py-16 bg-brand-tint animate-pulse">
-          <div className="container">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mx-auto mb-8" />
-            <div className="flex gap-6 justify-center items-center">
-              {[...Array(5)].map((_, idx) => (
-                <div key={idx} className="h-24 w-40 bg-gray-200 rounded-lg" />
-              ))}
             </div>
           </div>
         </section>
@@ -497,77 +481,6 @@ const Index: React.FC<IndexProps> = () => {
           </div>
         </section>
 
-        {/* Experience Section */}
-        <section className="py-16 bg-brand-tint">
-          <div className="container">
-            <div
-              className={`text-center max-w-xl mx-auto mb-12 ${isVisible ? "animate-fade-in" : "opacity-0"}`}
-              style={{
-                animationDelay: "0.1s",
-              }}
-            >
-              <div className="text-xs font-normal text-black mb-2">
-                {language.experience.sectionTitle}
-              </div>
-              <h2 className="title-modern center-title mb-8 mx-auto">
-                {language.experience.heading}
-              </h2>
-              <p className="text-gray-600 mt-8">{language.experience.description} </p>
-            </div>
-
-            <div
-              className={`grid md:grid-cols-3 gap-6 ${isVisible ? "animate-fade-in" : "opacity-0"}`}
-              style={{ animationDelay: "0.3s" }}
-            >
-              {positions.map((position, index) => {
-                // Cycle through colors for consistency
-                const colorIndex = index % 3;
-                const colorClass =
-                  colorIndex === 0
-                    ? "text-brand-purple"
-                    : colorIndex === 1
-                      ? "text-brand-magenta"
-                      : "text-brand-cyan";
-                return (
-                  <a
-                    key={position.id}
-                    href={position.companyUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="p-6 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 flex flex-col items-center"
-                  >
-                    <h3 className={`text-lg font-semibold mb-2 ${colorClass} text-center`}>
-                      {position.position}
-                    </h3>
-                    <p
-                      className="text-brand-black font-bold mb-3 text-center"
-                      style={
-                        document.documentElement.dir === "ltr"
-                          ? {
-                              fontFamily: "'Alibaba Sans', 'Segoe UI', 'Arial', sans-serif",
-                              fontWeight: 700,
-                            }
-                          : {}
-                      }
-                    >
-                      {position.companyName}
-                    </p>
-                    <p className="text-gray-600 text-sm text-center">{position.description}</p>
-                  </a>
-                );
-              })}
-            </div>
-            <div className="text-center mt-10">
-              <Link
-                to="/contact"
-                className="bg-brand-magenta px-6 py-3 border border-brand-magenta text-white rounded-md hover:bg-brand-magenta/90 hover:border-brand-magenta transition-colors"
-              >
-                {language.experience.cta}
-              </Link>
-            </div>
-          </div>
-        </section>
-
         {/* Services Section */}
         <section id="services" className="py-16 bg-white">
           <div className="container">
@@ -609,68 +522,6 @@ const Index: React.FC<IndexProps> = () => {
                 linkUrl="/services-implement"
                 serviceCardLang={serviceCardLang}
               />
-            </div>
-          </div>
-        </section>
-
-        {/* Sponsors Section  */}
-        <section className="py-16 bg-brand-tint">
-          <div className="container">
-            <div
-              className={`text-center max-w-xl mx-auto mb-12 ${isVisible ? "animate-fade-in" : "opacity-0"}`}
-              style={{
-                animationDelay: "0.1s",
-              }}
-            >
-              <div className="text-xs font-normal text-black mb-2">
-                {language.sponsors.sectionTitle}
-              </div>
-              <h2 className="title-modern center-title mb-8 mx-auto">
-                {language.sponsors.heading}
-              </h2>
-              <p className="text-gray-600 mt-8">{language.sponsors.description}</p>
-            </div>
-            <style>{`
-              .marquee-container {
-                overflow: hidden;
-                position: relative;
-                width: 100%;
-                height: 160px;
-                margin: 0 auto;
-              }
-              .marquee-row {
-                display: flex;
-                align-items: center;
-                gap: 1.5rem;
-                width: max-content;
-                animation: marquee-ltr 30s linear infinite;
-              }
-              [dir='rtl'] .marquee-row {
-                animation-name: marquee-rtl;
-              }
-              @keyframes marquee-ltr {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(-50%); }
-              }
-              @keyframes marquee-rtl {
-                0% { transform: translateX(0); }
-                100% { transform: translateX(50%); }
-              }
-            `}</style>
-            <div className="marquee-container">
-              <div className="marquee-row">
-                {[...sponsors, ...sponsors].map((sponsor, idx) => (
-                  <a
-                    key={`${sponsor.id}-${idx}`}
-                    href={sponsor.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="min-w-[180px] max-w-[220px] flex-shrink-0"
-                  >
-                    <SponsorLogo name={sponsor.name} imgSrc={sponsor.logo} />
-                  </a>
-                ))}
-              </div>
             </div>
           </div>
         </section>
