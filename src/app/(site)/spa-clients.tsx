@@ -12,6 +12,11 @@ export const BookClient = dynamic(() => import("@/spa/pages/BookRedirect"), {
 });
 export const CartClient = dynamic(() => import("@/spa/pages/Cart"), { ssr: false, loading });
 export const ContactClient = dynamic(() => import("@/spa/pages/Contact"), { ssr: false, loading });
+export const CoursesClient = dynamic(() => import("@/spa/pages/Courses"), { ssr: false, loading });
+export const AiAgentCourseClient = dynamic(() => import("@/spa/pages/AiAgentCourse"), {
+  ssr: false,
+  loading,
+});
 export const OrderThankYouClient = dynamic(() => import("@/spa/pages/OrderThankYou"), {
   ssr: false,
   loading,

@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown } from "lucide-react";
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { clearLanguageCache } from "@/lib/cacheManager";
@@ -12,6 +13,9 @@ interface NavBarLang {
   about: string;
   aboutMe: string;
   services: string;
+  courses: string;
+  coursesAll: string;
+  aiAgentCourse: string;
   blog: string;
   contact: string;
 }
@@ -19,6 +23,58 @@ interface NavBarLang {
 interface NavBarProps {
   lang: NavBarLang;
 }
+
+/** Courses entries, shared by the desktop dropdown and the mobile menu. */
+const courseLinks = (lang: NavBarLang) => [
+  { to: "/courses", label: lang.coursesAll },
+  { to: "/courses/ai-agent-course", label: lang.aiAgentCourse },
+];
+
+/**
+ * Desktop "Courses" menu. Opens on hover and on focus/click so it works with a
+ * mouse, a keyboard and a touch screen. Aligned to the start of the trigger so
+ * it lands correctly in both LTR and RTL.
+ */
+const CoursesDropdown: React.FC<{ lang: NavBarLang }> = ({ lang }) => {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div
+      className="relative"
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-haspopup="true"
+        onClick={() => setOpen((v) => !v)}
+        className="flex items-center gap-1 text-gray-800 hover:text-brand-purple transition-colors"
+      >
+        {lang.courses}
+        <ChevronDown
+          className={cn("h-4 w-4 transition-transform duration-200", open && "rotate-180")}
+        />
+      </button>
+      {open && (
+        <div className="absolute top-full start-0 pt-2 z-50">
+          <div className="min-w-[16rem] rounded-xl border border-gray-100 bg-white py-2 shadow-lg">
+            {courseLinks(lang).map((item) => (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setOpen(false)}
+                className="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-tint hover:text-brand-purple transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
 
 const getCurrentLang = () => {
   const stored = localStorage.getItem("selected_language");
@@ -40,6 +96,7 @@ const setLangAndReload = (lang: "en" | "fa") => {
 const NavBar: React.FC<NavBarProps> = ({ lang }) => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileCoursesOpen, setMobileCoursesOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isHomePage = location.pathname === "/";
@@ -106,6 +163,7 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
                 >
                   {lang.services}
                 </button>
+                <CoursesDropdown lang={lang} />
                 <Link
                   to="/blog"
                   className="text-gray-800 hover:text-brand-purple transition-colors"
@@ -171,6 +229,7 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
                 >
                   {lang.services}
                 </button>
+                <CoursesDropdown lang={lang} />
                 <Link
                   to="/blog"
                   className="text-gray-800 hover:text-brand-purple transition-colors"
@@ -337,6 +396,31 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
               >
                 {lang.services}
               </button>
+              <button
+                type="button"
+                aria-expanded={mobileCoursesOpen}
+                onClick={() => setMobileCoursesOpen((v) => !v)}
+                className={`${currentLang === "fa" ? "w-full flex-row-reverse justify-start text-right" : "w-full text-left"} flex items-center gap-1 text-gray-800 hover:text-brand-purple transition-colors py-2`}
+              >
+                {lang.courses}
+                <ChevronDown
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-200",
+                    mobileCoursesOpen && "rotate-180",
+                  )}
+                />
+              </button>
+              {mobileCoursesOpen &&
+                courseLinks(lang).map((item) => (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    className={`${currentLang === "fa" ? "w-full text-right pr-4" : "text-left pl-4"} text-sm text-gray-600 hover:text-brand-purple transition-colors py-1`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               <Link
                 to="/blog"
                 className={`${currentLang === "fa" ? "w-full text-right" : "text-left"} text-gray-800 hover:text-brand-purple transition-colors py-2`}

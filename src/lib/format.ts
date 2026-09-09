@@ -3,6 +3,11 @@ export function formatRial(amount: number): string {
   return `${amount.toLocaleString("en-US")} تومان`;
 }
 
+// Same amount with an English label, for the English side of bilingual pages.
+export function formatTomanEn(amount: number): string {
+  return `${amount.toLocaleString("en-US")} Toman`;
+}
+
 export function formatDate(d: Date | null): string {
   if (!d) return "—";
   return new Intl.DateTimeFormat("en-GB", {
