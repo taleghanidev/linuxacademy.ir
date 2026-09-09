@@ -13,10 +13,14 @@ export default function PayLinkQr({
   href,
   label,
   scanLabel,
+  amount,
 }: {
   href: string;
   label: string;
   scanLabel: string;
+  /** Shown on the card. A Wisetag link carries no amount, so the payer needs
+   *  to read it here before they type it in. */
+  amount?: string;
 }) {
   const [dataUrl, setDataUrl] = useState<string | null>(null);
 
@@ -41,6 +45,11 @@ export default function PayLinkQr({
         <img src={dataUrl} alt={`${label} QR`} className="h-36 w-36 rounded-lg" />
       ) : (
         <div className="h-36 w-36 animate-pulse rounded-lg bg-gray-100" />
+      )}
+      {amount && (
+        <span className="rounded-full bg-brand-purple/10 px-3 py-1 text-sm font-bold text-brand-purple">
+          {amount}
+        </span>
       )}
       <span className="text-xs text-gray-500">{scanLabel}</span>
       <a

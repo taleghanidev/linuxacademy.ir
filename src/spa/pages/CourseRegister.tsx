@@ -224,6 +224,7 @@ const CourseRegister = () => {
                   href={INTERNATIONAL_PAYMENT.wise}
                   label={lang.pay.wise}
                   scanLabel={lang.pay.scan}
+                  amount={fee}
                 />
               )}
               {INTERNATIONAL_PAYMENT.revolut && (
@@ -231,6 +232,7 @@ const CourseRegister = () => {
                   href={INTERNATIONAL_PAYMENT.revolut}
                   label={lang.pay.revolut}
                   scanLabel={lang.pay.scan}
+                  amount={fee}
                 />
               )}
             </div>
