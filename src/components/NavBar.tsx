@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import type React from "react";
 import { useContext, useEffect, useState } from "react";
 import { clearLanguageCache } from "@/lib/cacheManager";
@@ -37,6 +37,7 @@ const courseLinks = (lang: NavBarLang) => [
  */
 const CoursesDropdown: React.FC<{ lang: NavBarLang }> = ({ lang }) => {
   const [open, setOpen] = useState(false);
+  const { pathname } = useLocation();
 
   return (
     <div
@@ -59,16 +60,28 @@ const CoursesDropdown: React.FC<{ lang: NavBarLang }> = ({ lang }) => {
       {open && (
         <div className="absolute top-full start-0 pt-2 z-50">
           <div className="min-w-[16rem] rounded-xl border border-gray-100 bg-white py-2 shadow-lg">
-            {courseLinks(lang).map((item) => (
-              <Link
-                key={item.to}
-                to={item.to}
-                onClick={() => setOpen(false)}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-brand-tint hover:text-brand-purple transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {courseLinks(lang).map((item) => {
+              // Mark the page you are already on. Without this the click is a
+              // no-op and the menu just closes, which reads as a broken link.
+              const current = pathname === item.to;
+              return (
+                <Link
+                  key={item.to}
+                  to={item.to}
+                  aria-current={current ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                  className={cn(
+                    "flex items-center justify-between gap-2 px-4 py-2 text-sm transition-colors",
+                    current
+                      ? "bg-brand-tint font-medium text-brand-purple"
+                      : "text-gray-700 hover:bg-brand-tint hover:text-brand-purple",
+                  )}
+                >
+                  {item.label}
+                  {current && <Check className="h-4 w-4 shrink-0" />}
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}
@@ -411,16 +424,24 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
                 />
               </button>
               {mobileCoursesOpen &&
-                courseLinks(lang).map((item) => (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    className={`${currentLang === "fa" ? "w-full text-right pr-4" : "text-left pl-4"} text-sm text-gray-600 hover:text-brand-purple transition-colors py-1`}
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    {item.label}
-                  </Link>
-                ))}
+                courseLinks(lang).map((item) => {
+                  const current = location.pathname === item.to;
+                  return (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      aria-current={current ? "page" : undefined}
+                      className={`${currentLang === "fa" ? "w-full text-right pr-4" : "text-left pl-4"} text-sm transition-colors py-1 ${
+                        current
+                          ? "font-medium text-brand-purple"
+                          : "text-gray-600 hover:text-brand-purple"
+                      }`}
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
               <Link
                 to="/blog"
                 className={`${currentLang === "fa" ? "w-full text-right" : "text-left"} text-gray-800 hover:text-brand-purple transition-colors py-2`}
