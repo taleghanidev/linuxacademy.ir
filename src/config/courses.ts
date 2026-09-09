@@ -81,13 +81,13 @@ export const BANK_TRANSFER = {
  * just a link, and the page renders a QR code from it, so nothing here is an
  * image that can go stale. Leave a link empty and that option is hidden.
  *
- * TODO: `revolut` still needs the revolut.me link. Wise is live.
+ * Both links are live. Clearing either one hides that option on the page.
  */
 export const INTERNATIONAL_PAYMENT = {
   /** Wisetag: permanent and reusable, so it survives every cohort. */
   wise: "https://wise.com/pay/me/seyedamirmehdit",
-  /** e.g. "https://revolut.me/yourusername" */
-  revolut: "",
+  /** revolut.me RevTag link: permanent and reusable, same as the Wisetag. */
+  revolut: "https://revolut.me/matttaleg",
 } as const;
 
 /**
