@@ -356,10 +356,9 @@ const aiAgentCourseEn = {
     priceLabel: "Full course fee",
     priceIran: "Inside Iran",
     priceIntl: "Outside Iran",
-    originalLabel: "Full price",
-    discountBadge: "% off",
+    originalLabel: "Course price",
     residencyWarning:
-      "If you live outside Iran you pay in Australian dollars. The discounted Toman price is only for people living inside Iran.",
+      "Given the situation in Iran at the moment, this price is offered to people living there. If you live outside Iran, the course fee is payable in Australian dollars.",
     priceNote: "A flat price for all 10 sessions, with nothing else to pay.",
     guaranteeHeading: "Refund guarantee",
     guarantee:

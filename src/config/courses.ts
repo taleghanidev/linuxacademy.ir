@@ -128,11 +128,3 @@ export function lastSessionDate(course: Course): string {
   const all = sessionDates(course);
   return all[all.length - 1];
 }
-
-/**
- * Whole-number percentage off, derived rather than stored so the badge can
- * never disagree with the two prices it sits between.
- */
-export function discountPercent(course: Course): number {
-  return Math.round((1 - course.price / course.priceOriginal) * 100);
-}

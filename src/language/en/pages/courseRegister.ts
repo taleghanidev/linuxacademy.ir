@@ -11,7 +11,7 @@ const courseRegisterEn = {
     iran: "Inside Iran",
     international: "Outside Iran",
     warning:
-      "The discounted Toman price is only for people living inside Iran. If you are outside Iran you must pay in Australian dollars.",
+      "Given the situation in Iran at the moment, the Toman price is offered to people living there. If you are outside Iran, the fee is payable in Australian dollars.",
   },
 
   steps: {
