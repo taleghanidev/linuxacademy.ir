@@ -36,8 +36,8 @@ export type Course = {
 
 export const AI_AGENT_COURSE: Course = {
   slug: "ai-agent-course",
-  hours: 16,
-  sessions: 8,
+  hours: 20,
+  sessions: 10,
   sessionHours: 2,
   weekday: "friday",
   startDate: "2026-10-23",

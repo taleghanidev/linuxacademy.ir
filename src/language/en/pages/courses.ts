@@ -10,8 +10,8 @@ const coursesEn = {
       slug: "ai-agent-course",
       title: "Building AI Agents",
       description:
-        "From the terminal and the APIs to an agent you have built and deployed. Eight Fridays, two live hours each, 12 modules and 93 lessons.",
-      meta: ["Fridays 12:00 to 14:00", "16 hours", "12 seats"],
+        "From the terminal and the APIs to an agent you have built and deployed. Ten Fridays, two live hours each, 12 modules and 93 lessons.",
+      meta: ["Fridays 12:00 to 14:00", "20 hours", "12 seats"],
       linkUrl: "/courses/ai-agent-course",
     },
   ],

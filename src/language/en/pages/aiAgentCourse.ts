@@ -2,7 +2,7 @@ const aiAgentCourseEn = {
   eyebrow: "Live online workshop",
   title: "Build an AI agent, from scratch",
   subtitle:
-    "Eight Fridays, two hours each. When the last session ends you have an agent you built yourself, running on a server.",
+    "Ten Fridays, two hours each. When the last session ends you have an agent you built yourself, running on a server.",
   ctaEnroll: "Enroll in the course",
   ctaSyllabus: "See the syllabus",
 
@@ -40,7 +40,7 @@ const aiAgentCourseEn = {
     format: { label: "Format", value: "Live online, two-way" },
     when: { label: "When", value: "Fridays, 12:00 to 14:00 Tehran time" },
     starts: { label: "Starts", value: "" },
-    duration: { label: "Length", value: "8 sessions, 16 hours of teaching" },
+    duration: { label: "Length", value: "10 sessions, 20 hours" },
     content: { label: "Content", value: "12 modules, 93 lessons" },
     seats: { label: "Seats", value: "12 per cohort" },
     language: { label: "Language", value: "Persian, with English terminology" },
@@ -94,64 +94,9 @@ const aiAgentCourseEn = {
     ],
   },
 
-  schedule: {
-    heading: "The eight Fridays",
-    note: "Each session is two live hours. Modules do not always end on a session boundary. Wherever we stop, we pick up there the following week.",
-    weekLabel: "Session",
-    weeks: [
-      {
-        week: "1",
-        focus: "Foundations: what an agent is, what a model is",
-        detail: "The three parts of an agent, kinds of AI, neural networks, parameters and tokens.",
-      },
-      {
-        week: "2",
-        focus: "Models, providers and the API",
-        detail:
-          "Hosted or open weights, the shape of a request, status codes, retries, the knobs that matter.",
-      },
-      {
-        week: "3",
-        focus: "Running a model yourself",
-        detail:
-          "Model file formats, working out what fits, llama.cpp and vLLM, one shape for every provider.",
-      },
-      {
-        week: "4",
-        focus: "Inside an agent",
-        detail:
-          "Context, the loop, the prompt as a program, tools and skills and memory, auth and keys.",
-      },
-      {
-        week: "5",
-        focus: "The open web and your working machine",
-        detail:
-          "Fetching versus reading a page, signing in without a password, captchas, Linux, the terminal, package managers.",
-      },
-      {
-        week: "6",
-        focus: "Claude Code up close",
-        detail:
-          "Modes, managed context, CLAUDE.md and memory and skills, subagents and hooks and MCP, unattended runs.",
-      },
-      {
-        week: "7",
-        focus: "Safety, cost and running without you",
-        detail:
-          "Caching, what leaves the building, tool trust levels, prompt injection, git, triggers, webhooks and traces.",
-      },
-      {
-        week: "8",
-        focus: "Building on foldrun, and the capstone",
-        detail:
-          "An agent as a folder, flows, structured output, evals, deployment, and one complete agent built live.",
-      },
-    ],
-  },
-
   curriculum: {
     heading: "The full syllabus, module by module",
-    note: "12 modules, 93 lessons, 16 hours of live teaching. Open a module to see its lessons.",
+    note: "12 modules, 93 lessons. About 16 hours of teaching, with the rest of each session given to hands-on work and questions. Open a module to see its lessons.",
     lessonsLabel: "lessons",
     modules: [
       {
@@ -372,10 +317,10 @@ const aiAgentCourseEn = {
   includes: {
     heading: "What you get",
     items: [
-      "16 hours of live teaching in a room of no more than 12",
+      "20 hours of live sessions in a room of no more than 12",
       "A recording of every session, with no expiry on access",
       "Slides and full notes for all 93 lessons",
-      "A private question and answer channel for the eight weeks",
+      "A private question and answer channel for the ten weeks",
     ],
   },
 
@@ -411,7 +356,7 @@ const aiAgentCourseEn = {
     priceLabel: "Full course fee",
     priceIran: "Inside Iran",
     priceIntl: "Outside Iran",
-    priceNote: "A flat price for all 8 sessions, with nothing else to pay.",
+    priceNote: "A flat price for all 10 sessions, with nothing else to pay.",
     guaranteeHeading: "Refund guarantee",
     guarantee:
       "If by the end of session two you decide this is not what you expected, you get the full amount back, no questions asked.",
