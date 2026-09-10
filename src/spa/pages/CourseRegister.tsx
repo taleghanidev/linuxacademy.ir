@@ -192,6 +192,13 @@ const CourseRegister = () => {
           ))}
         </div>
 
+        <p
+          role="note"
+          className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium leading-relaxed text-red-700"
+        >
+          {lang.region.warning}
+        </p>
+
         <div className="mb-10 flex flex-wrap items-center justify-between gap-3 rounded-xl border-2 border-brand-purple bg-white p-5">
           <span className="text-sm font-medium text-brand-purple">{lang.feeLabel}</span>
           <span className="text-2xl font-bold text-gray-900">{fee}</span>

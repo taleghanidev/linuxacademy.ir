@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import FaqAccordion from "@/components/FaqAccordion";
 import PageShell, { useIsFa } from "@/components/PageShell";
-import { AI_AGENT_COURSE, lastSessionDate } from "@/config/courses";
+import { AI_AGENT_COURSE, discountPercent, lastSessionDate } from "@/config/courses";
 import aiAgentCourseEn from "@/language/en/pages/aiAgentCourse";
 import aiAgentCourseFa from "@/language/fa/pages/aiAgentCourse";
 import { formatCourseDate, formatMoney, formatRial, formatTomanEn } from "@/lib/format";
@@ -98,6 +98,8 @@ const AiAgentCourse = () => {
   const course = AI_AGENT_COURSE;
   const priceIran = isFa ? formatRial(course.price) : formatTomanEn(course.price);
   const priceIntl = formatMoney(course.priceAud, "AUD");
+  const priceWas = isFa ? formatRial(course.priceOriginal) : formatTomanEn(course.priceOriginal);
+  const off = discountPercent(course);
 
   const startsOn = formatCourseDate(course.startDate, isFa);
   const endsOn = formatCourseDate(lastSessionDate(course), isFa);
@@ -151,6 +153,7 @@ const AiAgentCourse = () => {
                 </a>
               </div>
               <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-gray-500">
+                <span className="text-gray-400 line-through">{priceWas}</span>
                 <span className="font-bold text-gray-900">{priceIran}</span>
                 <span>{lang.pricing.priceIran}</span>
                 <span className="h-1 w-1 rounded-full bg-gray-300" />
@@ -333,8 +336,13 @@ const AiAgentCourse = () => {
               {lang.pricing.priceLabel}
             </div>
             <div className="mb-5 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl bg-brand-tint p-5">
+              <div className="relative rounded-xl bg-brand-tint p-5">
+                <span className="absolute end-3 top-3 rounded-full bg-red-600 px-2 py-0.5 text-xs font-bold text-white">
+                  {isFa ? off.toLocaleString("fa-IR") : off}
+                  {lang.pricing.discountBadge}
+                </span>
                 <div className="mb-1 text-xs text-gray-500">{lang.pricing.priceIran}</div>
+                <div className="text-sm text-gray-400 line-through">{priceWas}</div>
                 <div className="text-3xl font-bold text-gray-900">{priceIran}</div>
               </div>
               <div className="rounded-xl bg-brand-tint p-5">
@@ -342,6 +350,12 @@ const AiAgentCourse = () => {
                 <div className="text-3xl font-bold text-gray-900">{priceIntl}</div>
               </div>
             </div>
+            <p
+              role="note"
+              className="mb-5 rounded-xl border border-red-200 bg-red-50 p-4 text-start text-sm font-medium leading-relaxed text-red-700"
+            >
+              {lang.pricing.residencyWarning}
+            </p>
             <p className="mb-6 text-sm text-gray-600">{lang.pricing.priceNote}</p>
             {cta("lg")}
             <p className="mt-4 text-sm text-gray-500">{lang.enroll.ctaNote}</p>

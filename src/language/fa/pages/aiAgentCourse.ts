@@ -355,6 +355,10 @@ const aiAgentCourseFa = {
     priceLabel: "شهریه کامل دوره",
     priceIran: "داخل ایران",
     priceIntl: "خارج از ایران",
+    originalLabel: "قیمت اصلی",
+    discountBadge: "٪ تخفیف",
+    residencyWarning:
+      "اگر خارج از ایران زندگی می‌کنید، باید شهریه را به دلار استرالیا بپردازید. قیمت تومانی با تخفیف، فقط برای کسانی است که داخل ایران زندگی می‌کنند.",
     priceNote: "قیمت مقطوع برای هر ۱۰ جلسه؛ بدون هزینه جانبی.",
     guaranteeHeading: "تضمین بازگشت وجه",
     guarantee:

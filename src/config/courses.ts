@@ -26,7 +26,9 @@ export type Course = {
   lessons: number;
   /** Seats in one cohort. Small by design. */
   seats: number;
-  /** Fee for students inside Iran, in Toman. */
+  /** Undiscounted fee, in Toman. Shown struck through next to `price`. */
+  priceOriginal: number;
+  /** Fee for students inside Iran, in Toman, after the discount. */
   price: number;
   /** Fee for students outside Iran, in Australian dollars. */
   priceAud: number;
@@ -47,7 +49,8 @@ export const AI_AGENT_COURSE: Course = {
   modules: 12,
   lessons: 104,
   seats: 12,
-  price: 4_900_000,
+  priceOriginal: 16_600_000,
+  price: 4_980_000,
   priceAud: 100,
   language: "fa",
   level: "beginner-to-intermediate",
@@ -124,4 +127,12 @@ export function sessionDates(course: Course): string[] {
 export function lastSessionDate(course: Course): string {
   const all = sessionDates(course);
   return all[all.length - 1];
+}
+
+/**
+ * Whole-number percentage off, derived rather than stored so the badge can
+ * never disagree with the two prices it sits between.
+ */
+export function discountPercent(course: Course): number {
+  return Math.round((1 - course.price / course.priceOriginal) * 100);
 }

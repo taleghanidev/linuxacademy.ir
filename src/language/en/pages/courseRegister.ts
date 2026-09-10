@@ -10,6 +10,8 @@ const courseRegisterEn = {
     note: "This sets your fee and the account you pay into.",
     iran: "Inside Iran",
     international: "Outside Iran",
+    warning:
+      "The discounted Toman price is only for people living inside Iran. If you are outside Iran you must pay in Australian dollars.",
   },
 
   steps: {
