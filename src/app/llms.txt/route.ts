@@ -23,7 +23,7 @@ export function GET() {
     "## Courses",
     "",
     `- [دوره‌ها / Courses](${SITE_URL}/courses): Live online workshops taught in small cohorts, with a real project`,
-    `- [دوره ساخت ایجنت هوش مصنوعی / Building AI Agents](${SITE_URL}/courses/ai-agent-course): 8-week live workshop starting Friday 6 November 2026, Fridays 12:00-14:00 Tehran time, 16 hours across 12 modules and 93 lessons, capped at 12 seats. Covers Linux and the terminal including curl, every current model API (OpenAI Chat Completions and Responses, Anthropic Messages, Google Gemini via AI Studio and Vertex), running models locally with Ollama, how an agent works, the open web, hands-on Claude Code, Codex and opencode, safety and cost, no-code tools and agent orchestration patterns, and building plus deploying an agent as a capstone`,
+    `- [دوره ساخت ایجنت هوش مصنوعی / Building AI Agents](${SITE_URL}/courses/ai-agent-course): 8-week live workshop starting Friday 23 October 2026, Fridays 12:00-14:00 Tehran time, 16 hours across 12 modules and 93 lessons, capped at 12 seats. Covers Linux and the terminal including curl, every current model API (OpenAI Chat Completions and Responses, Anthropic Messages, Google Gemini via AI Studio and Vertex), running models locally with Ollama, how an agent works, the open web, hands-on Claude Code, Codex and opencode, safety and cost, no-code tools and agent orchestration patterns, and building plus deploying an agent as a capstone`,
     "",
     "## Blog (فارسی)",
     "",

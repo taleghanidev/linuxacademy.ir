@@ -40,7 +40,7 @@ export const AI_AGENT_COURSE: Course = {
   sessions: 8,
   sessionHours: 2,
   weekday: "friday",
-  startDate: "2026-11-06",
+  startDate: "2026-10-23",
   startTime: "12:00",
   endTime: "14:00",
   timeZone: "Asia/Tehran",
@@ -64,19 +64,18 @@ export function getCourse(slug: string): Course | undefined {
  * photo of the receipt, so these values are shown verbatim on the page and
  * people will type them into a banking app.
  *
- * TODO: replace every value below with the real account before announcing the
- * course. They are placeholders, not a live account.
+ * These are live details. Both were checked: the IBAN passes its mod-97
+ * checksum, the card passes Luhn, and both resolve to Saman Bank.
  */
 export type PayRegion = "iran" | "international";
 
 export const BANK_TRANSFER = {
-  bankName: "بانک ملت",
-  accountHolder: "امیرمهدی طالقانی",
-  /** 16-digit card number, the usual way to transfer in Iran. */
-  cardNumber: "0000-0000-0000-0000",
-  /** IR + 24 digits. */
-  iban: "IR000000000000000000000000",
-  accountNumber: "0000000000",
+  bankName: "بانک سامان",
+  accountHolder: "سیدارشان طالقانی",
+  /** 16-digit card number, the usual way to transfer money in Iran. */
+  cardNumber: "6219 8619 1189 8483",
+  /** IR + 24 digits. Checksum verified. */
+  iban: "IR890560611828005170703001",
 } as const;
 
 /**

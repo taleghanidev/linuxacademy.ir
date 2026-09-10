@@ -269,7 +269,6 @@ const CourseRegister = () => {
             : [
                 { label: lang.bank.cardNumber, value: BANK_TRANSFER.cardNumber },
                 { label: lang.bank.iban, value: BANK_TRANSFER.iban },
-                { label: lang.bank.accountNumber, value: BANK_TRANSFER.accountNumber },
               ]
           ).map((row) => (
             <BankRow
