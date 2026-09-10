@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
-import { AI_AGENT_COURSE } from "@/config/courses";
+import { AI_AGENT_COURSE, lastSessionDate } from "@/config/courses";
 import aiAgentCourseFa from "@/language/fa/pages/aiAgentCourse";
 import { courseJsonLd, faqJsonLd, SITE_NAME_FA, SITE_URL } from "@/lib/seo";
 import { AiAgentCourseClient } from "../../spa-clients";
@@ -8,7 +8,7 @@ import { AiAgentCourseClient } from "../../spa-clients";
 const PATH = "/courses/ai-agent-course";
 
 const DESCRIPTION =
-  "کارگاه آنلاین زنده ساخت ایجنت هوش مصنوعی؛ جمعه‌ها ۱۲:۰۰ تا ۱۴:۰۰ به وقت تهران، ۸ جلسه و ۱۶ ساعت آموزش، ۱۲ فصل و ۹۳ درس، ظرفیت ۱۲ نفر، همراه با پروژه پایانی.";
+  "کارگاه آنلاین زنده ساخت ایجنت هوش مصنوعی؛ شروع جمعه ۱۵ آبان ۱۴۰۵، جمعه‌ها ۱۲:۰۰ تا ۱۴:۰۰ به وقت تهران، ۸ جلسه و ۱۶ ساعت آموزش، ۱۲ فصل و ۹۳ درس، ظرفیت ۱۲ نفر، همراه با پروژه پایانی.";
 
 export const metadata: Metadata = {
   title: `دوره ساخت ایجنت هوش مصنوعی | ${SITE_NAME_FA}`,
@@ -43,6 +43,8 @@ export default function Route() {
           hours: AI_AGENT_COURSE.hours,
           sessions: AI_AGENT_COURSE.sessions,
           byDay: "Friday",
+          startDate: AI_AGENT_COURSE.startDate,
+          endDate: lastSessionDate(AI_AGENT_COURSE),
           startTime: AI_AGENT_COURSE.startTime,
           endTime: AI_AGENT_COURSE.endTime,
           price: AI_AGENT_COURSE.price,

@@ -39,6 +39,7 @@ const aiAgentCourseEn = {
     heading: "At a glance",
     format: { label: "Format", value: "Live online, two-way" },
     when: { label: "When", value: "Fridays, 12:00 to 14:00 Tehran time" },
+    starts: { label: "Starts", value: "" },
     duration: { label: "Length", value: "8 sessions, 16 hours of teaching" },
     content: { label: "Content", value: "12 modules, 93 lessons" },
     seats: { label: "Seats", value: "12 per cohort" },

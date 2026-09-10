@@ -39,6 +39,7 @@ const aiAgentCourseFa = {
     heading: "یک نگاه کوتاه",
     format: { label: "شکل برگزاری", value: "آنلاین و زنده، دوطرفه" },
     when: { label: "زمان", value: "جمعه‌ها، ساعت ۱۲:۰۰ تا ۱۴:۰۰ به وقت تهران" },
+    starts: { label: "شروع دوره", value: "" },
     duration: { label: "طول دوره", value: "۸ جلسه، مجموعاً ۱۶ ساعت آموزش" },
     content: { label: "محتوا", value: "۱۲ فصل، ۹۳ درس" },
     seats: { label: "ظرفیت", value: "۱۲ نفر در هر دوره" },

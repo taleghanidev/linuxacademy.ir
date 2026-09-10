@@ -1,13 +1,22 @@
 "use client";
 
-import { Calendar, Check, ChevronDown, Clock, Layers, Users, Wrench } from "lucide-react";
+import {
+  Calendar,
+  CalendarDays,
+  Check,
+  ChevronDown,
+  Clock,
+  Layers,
+  Users,
+  Wrench,
+} from "lucide-react";
 import { useState } from "react";
 import FaqAccordion from "@/components/FaqAccordion";
 import PageShell, { useIsFa } from "@/components/PageShell";
-import { AI_AGENT_COURSE } from "@/config/courses";
+import { AI_AGENT_COURSE, lastSessionDate } from "@/config/courses";
 import aiAgentCourseEn from "@/language/en/pages/aiAgentCourse";
 import aiAgentCourseFa from "@/language/fa/pages/aiAgentCourse";
-import { formatMoney, formatRial, formatTomanEn } from "@/lib/format";
+import { formatCourseDate, formatMoney, formatRial, formatTomanEn } from "@/lib/format";
 import { Link } from "@/lib/router";
 import { cn } from "@/lib/utils";
 
@@ -90,7 +99,11 @@ const AiAgentCourse = () => {
   const priceIran = isFa ? formatRial(course.price) : formatTomanEn(course.price);
   const priceIntl = formatMoney(course.priceAud, "AUD");
 
+  const startsOn = formatCourseDate(course.startDate, isFa);
+  const endsOn = formatCourseDate(lastSessionDate(course), isFa);
+
   const facts = [
+    { icon: CalendarDays, label: lang.quickFacts.starts.label, value: startsOn },
     { icon: Calendar, ...lang.quickFacts.when },
     { icon: Clock, ...lang.quickFacts.duration },
     { icon: Layers, ...lang.quickFacts.content },
@@ -121,6 +134,13 @@ const AiAgentCourse = () => {
               </span>
               <h1 className="mb-5 text-4xl font-bold leading-[1.15] md:text-5xl">{lang.title}</h1>
               <p className="mb-8 max-w-xl text-xl leading-relaxed text-gray-600">{lang.subtitle}</p>
+              <p className="mb-6 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm">
+                <CalendarDays className="h-4 w-4 text-brand-purple" />
+                {lang.quickFacts.starts.label}: {startsOn}
+                <span className="font-normal text-gray-400">
+                  {"\u2192"} {endsOn}
+                </span>
+              </p>
               <div className="mb-6 flex flex-wrap items-center gap-4">
                 {cta("lg")}
                 <a
@@ -173,7 +193,7 @@ const AiAgentCourse = () => {
       {/* ── Facts strip ──────────────────────────────────────────────────── */}
       <div className="border-b border-gray-100 bg-white">
         <div className="container mx-auto">
-          <div className="grid gap-x-6 gap-y-5 py-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-x-6 gap-y-5 py-6 sm:grid-cols-2 lg:grid-cols-5">
             {facts.map((fact) => (
               <div key={fact.label} className="flex items-center gap-3">
                 <fact.icon className="h-5 w-5 shrink-0 text-brand-purple" />

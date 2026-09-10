@@ -44,6 +44,10 @@ export function courseJsonLd(opts: {
   byDay: string;
   startTime: string;
   endTime: string;
+  /** ISO date of the first session. */
+  startDate?: string;
+  /** ISO date of the last session. */
+  endDate?: string;
   price: number;
   priceCurrency?: string;
   inLanguage?: string;
@@ -64,8 +68,12 @@ export function courseJsonLd(opts: {
       courseWorkload: `PT${opts.hours}H`,
       repeatCount: opts.sessions,
       repeatFrequency: "weekly",
+      ...(opts.startDate ? { startDate: opts.startDate } : {}),
+      ...(opts.endDate ? { endDate: opts.endDate } : {}),
       courseSchedule: {
         "@type": "Schedule",
+        ...(opts.startDate ? { startDate: opts.startDate } : {}),
+        ...(opts.endDate ? { endDate: opts.endDate } : {}),
         repeatFrequency: "P1W",
         repeatCount: opts.sessions,
         byDay: `https://schema.org/${opts.byDay}`,

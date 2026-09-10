@@ -16,6 +16,8 @@ export type Course = {
   sessionHours: number;
   /** Day of week the workshop runs. */
   weekday: "friday";
+  /** First session, ISO date. Every other session is a week later. */
+  startDate: string;
   /** Local start/end time, 24h, in the timezone below. */
   startTime: string;
   endTime: string;
@@ -38,6 +40,7 @@ export const AI_AGENT_COURSE: Course = {
   sessions: 8,
   sessionHours: 2,
   weekday: "friday",
+  startDate: "2026-11-06",
   startTime: "12:00",
   endTime: "14:00",
   timeZone: "Asia/Tehran",
@@ -105,3 +108,21 @@ export const BANK_TRANSFER_INTL = {
   /** For transfers from outside Australia. */
   swift: "TODOAU0S",
 } as const;
+
+/** Every session date for a course, derived from its start date. */
+export function sessionDates(course: Course): string[] {
+  const out: string[] = [];
+  const first = new Date(`${course.startDate}T00:00:00Z`);
+  for (let i = 0; i < course.sessions; i++) {
+    const d = new Date(first);
+    d.setUTCDate(d.getUTCDate() + 7 * i);
+    out.push(d.toISOString().slice(0, 10));
+  }
+  return out;
+}
+
+/** ISO date of the final session. */
+export function lastSessionDate(course: Course): string {
+  const all = sessionDates(course);
+  return all[all.length - 1];
+}

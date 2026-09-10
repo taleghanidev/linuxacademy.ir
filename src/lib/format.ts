@@ -38,3 +38,26 @@ export function formatDateTime(d: Date | string | null, timeZone = "Australia/Sy
     timeZone,
   }).format(date);
 }
+
+/**
+ * A course date for display. Persian readers get the Jalali calendar, which is
+ * the one they actually plan by; English readers get the Gregorian date.
+ */
+export function formatCourseDate(iso: string, isFa: boolean): string {
+  const d = new Date(`${iso}T00:00:00Z`);
+  if (isFa) {
+    return new Intl.DateTimeFormat("fa-IR-u-ca-persian", {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+      timeZone: "UTC",
+    }).format(d);
+  }
+  return new Intl.DateTimeFormat("en-GB", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(d);
+}
