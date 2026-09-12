@@ -413,7 +413,7 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
                 type="button"
                 aria-expanded={mobileCoursesOpen}
                 onClick={() => setMobileCoursesOpen((v) => !v)}
-                className={`${currentLang === "fa" ? "w-full flex-row-reverse justify-start text-right" : "w-full text-left"} flex items-center gap-1 text-gray-800 hover:text-brand-purple transition-colors py-2`}
+                className="flex w-full items-center gap-1 text-start text-gray-800 hover:text-brand-purple transition-colors py-2"
               >
                 {lang.courses}
                 <ChevronDown
