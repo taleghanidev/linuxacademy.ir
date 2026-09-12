@@ -6,6 +6,7 @@ import { useContext, useEffect, useState } from "react";
 import { clearLanguageCache } from "@/lib/cacheManager";
 import { Link, useLocation, useNavigate } from "@/lib/router";
 import { cn } from "@/lib/utils";
+import CartButton from "./CartButton";
 import { GlobalContext } from "./GlobalContext";
 
 interface NavBarLang {
@@ -153,6 +154,7 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
         isScrolled ? "bg-white/90 backdrop-blur-sm shadow-sm" : "bg-transparent",
       )}
       dir={currentLang === "fa" ? "rtl" : "ltr"}
+      data-site-nav=""
     >
       <div className="container flex items-center justify-between relative">
         {/* Desktop: Persian [menu][lang][logo], English [menu][lang][logo] (logo right, menu left) */}
@@ -211,6 +213,7 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
                     🇮🇷
                   </button>
                 </div>
+                <CartButton variant="inline" />
               </div>
               {/* Logo and site name (left) */}
               <Link to="/" className="flex items-center gap-2 font-bold order-2">
@@ -277,6 +280,7 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
                     🇮🇷
                   </button>
                 </div>
+                <CartButton variant="inline" />
               </div>
               {/* Logo and site name (right) */}
               <Link to="/" className="flex items-center gap-2 font-bold order-2 justify-end">
@@ -295,11 +299,14 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
         {currentLang === "en" && (
           <div className="flex md:hidden w-full items-center justify-between relative">
             {/* Burger menu (left) */}
-            <button className="p-2 order-1" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
-              <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
-              <div className="w-6 h-0.5 bg-navy"></div>
-            </button>
+            <div className="flex items-center gap-2 order-1">
+              <button className="p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
+                <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
+                <div className="w-6 h-0.5 bg-navy"></div>
+              </button>
+              <CartButton variant="inline" />
+            </div>
             {/* Language Switcher (center) */}
             <div className="flex items-center gap-1 select-none order-2 flex-1 justify-center">
               <button
@@ -370,11 +377,14 @@ const NavBar: React.FC<NavBarProps> = ({ lang }) => {
               </button>
             </div>
             {/* Burger menu (right, last in JSX, but left in row-reverse) */}
-            <button className="p-2 order-3" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-              <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
-              <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
-              <div className="w-6 h-0.5 bg-navy"></div>
-            </button>
+            <div className="flex items-center gap-2 order-3">
+              <button className="p-2" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+                <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
+                <div className="w-6 h-0.5 bg-navy mb-1.5"></div>
+                <div className="w-6 h-0.5 bg-navy"></div>
+              </button>
+              <CartButton variant="inline" />
+            </div>
           </div>
         )}
         {/* Mobile menu (unchanged, but remove language switcher) */}

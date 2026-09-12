@@ -211,3 +211,9 @@ html[dir="ltr"], body[dir="ltr"] {
   text-align: left;
   font-family: 'Vazirmatn', 'Tahoma', 'Arial', 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
 }
+
+/* The floating cart is only for pages without the site NavBar; the NavBar
+   carries its own inline cart so the two never overlap the logo. */
+body:has(nav[data-site-nav]) .site-cart-floating {
+  display: none;
+}
