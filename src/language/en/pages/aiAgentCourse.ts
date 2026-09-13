@@ -426,11 +426,6 @@ const aiAgentCourseEn = {
         answer:
           "You can withdraw up to the end of session two and the full amount you paid is returned, no questions asked.",
       },
-      {
-        question: "Do you run this for teams?",
-        answer:
-          "Yes. The same course runs privately for company teams, with examples drawn from your own work. Ask through the contact page.",
-      },
     ],
   },
 

@@ -19,6 +19,45 @@ import { cn } from "@/lib/utils";
 
 type Status = "idle" | "sending" | "done";
 
+// Country dialling codes for the phone field. Iran first, then the countries
+// most students write in from.
+const DIAL_CODES = [
+  { code: "+98", flag: "🇮🇷", name: "Iran" },
+  { code: "+61", flag: "🇦🇺", name: "Australia" },
+  { code: "+1", flag: "🇺🇸", name: "USA / Canada" },
+  { code: "+44", flag: "🇬🇧", name: "United Kingdom" },
+  { code: "+49", flag: "🇩🇪", name: "Germany" },
+  { code: "+31", flag: "🇳🇱", name: "Netherlands" },
+  { code: "+33", flag: "🇫🇷", name: "France" },
+  { code: "+39", flag: "🇮🇹", name: "Italy" },
+  { code: "+34", flag: "🇪🇸", name: "Spain" },
+  { code: "+46", flag: "🇸🇪", name: "Sweden" },
+  { code: "+47", flag: "🇳🇴", name: "Norway" },
+  { code: "+45", flag: "🇩🇰", name: "Denmark" },
+  { code: "+41", flag: "🇨🇭", name: "Switzerland" },
+  { code: "+43", flag: "🇦🇹", name: "Austria" },
+  { code: "+90", flag: "🇹🇷", name: "Türkiye" },
+  { code: "+971", flag: "🇦🇪", name: "UAE" },
+  { code: "+974", flag: "🇶🇦", name: "Qatar" },
+  { code: "+968", flag: "🇴🇲", name: "Oman" },
+  { code: "+964", flag: "🇮🇶", name: "Iraq" },
+  { code: "+93", flag: "🇦🇫", name: "Afghanistan" },
+  { code: "+374", flag: "🇦🇲", name: "Armenia" },
+  { code: "+994", flag: "🇦🇿", name: "Azerbaijan" },
+  { code: "+7", flag: "🇷🇺", name: "Russia" },
+  { code: "+64", flag: "🇳🇿", name: "New Zealand" },
+  { code: "+60", flag: "🇲🇾", name: "Malaysia" },
+  { code: "+81", flag: "🇯🇵", name: "Japan" },
+  { code: "+86", flag: "🇨🇳", name: "China" },
+];
+
+/** Persian/Arabic digits to ASCII, then keep digits only. */
+const digitsOnly = (v: string) =>
+  v
+    .replace(/[۰-۹]/g, (d) => String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)))
+    .replace(/[٠-٩]/g, (d) => String("٠١٢٣٤٥٦٧٨٩".indexOf(d)))
+    .replace(/\D/g, "");
+
 /** One bank field with a copy-to-clipboard button. */
 function BankRow({
   label,
@@ -82,6 +121,7 @@ const CourseRegister = () => {
 
   const [status, setStatus] = useState<Status>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [dialCode, setDialCode] = useState("+98");
   const [fileName, setFileName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -98,6 +138,14 @@ const CourseRegister = () => {
     const form = new FormData(e.currentTarget);
     form.set("courseSlug", course.slug);
     form.set("payRegion", region);
+
+    // Phone is required and sent as "+<code> <number>", without a trunk zero.
+    const local = digitsOnly(String(form.get("phone") ?? "")).replace(/^0+/, "");
+    if (local.length < 6 || local.length > 14) {
+      setError(errorText("invalid_phone"));
+      return;
+    }
+    form.set("phone", `${dialCode} ${local}`);
 
     // Check the file here too, so the common mistake never costs a round trip.
     const file = form.get("receipt");
@@ -319,7 +367,6 @@ const CourseRegister = () => {
                 id={ids.email}
                 name="email"
                 type="email"
-                required
                 autoComplete="email"
                 dir="ltr"
                 placeholder={lang.form.emailPlaceholder}
@@ -330,16 +377,30 @@ const CourseRegister = () => {
               <label htmlFor={ids.phone} className="mb-1.5 block text-sm font-medium text-gray-700">
                 {lang.form.phone}
               </label>
-              <input
-                id={ids.phone}
-                name="phone"
-                type="tel"
-                required
-                autoComplete="tel"
-                dir="ltr"
-                placeholder={lang.form.phonePlaceholder}
-                className={field}
-              />
+              <div className="flex gap-2" dir="ltr">
+                <select
+                  aria-label={lang.form.countryCode}
+                  value={dialCode}
+                  onChange={(e) => setDialCode(e.target.value)}
+                  className={cn(field, "w-28 shrink-0 px-2")}
+                >
+                  {DIAL_CODES.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.flag} {c.code}
+                    </option>
+                  ))}
+                </select>
+                <input
+                  id={ids.phone}
+                  name="phone"
+                  type="tel"
+                  required
+                  autoComplete="tel-national"
+                  inputMode="tel"
+                  placeholder={lang.form.phonePlaceholder}
+                  className={field}
+                />
+              </div>
             </div>
           </div>
 

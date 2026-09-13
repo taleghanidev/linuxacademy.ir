@@ -25,7 +25,7 @@ const courseRegisterEn = {
         title: "Upload the receipt",
         desc: "Fill in the form and attach a photo or file of your payment receipt.",
       },
-      { title: "Seat confirmed", desc: "We check the receipt and let you know by email." },
+      { title: "Seat confirmed", desc: "We check the receipt and let you know by phone or email." },
     ],
   },
 
@@ -56,10 +56,11 @@ const courseRegisterEn = {
     heading: "Registration form",
     fullName: "Full name",
     fullNamePlaceholder: "Your full name",
-    email: "Email",
+    email: "Email (optional)",
     emailPlaceholder: "you@example.com",
+    countryCode: "Country code",
     phone: "Phone",
-    phonePlaceholder: "09123456789",
+    phonePlaceholder: "9123456789",
     note: "Anything else (optional)",
     notePlaceholder: "If there is something we should know, write it here.",
     receipt: "Payment receipt",
@@ -72,7 +73,7 @@ const courseRegisterEn = {
 
   success: {
     heading: "We have your registration",
-    body: "We will check your receipt and email you the result. If you have not heard from us within two working days, get in touch through the contact page.",
+    body: "We will check your receipt and contact you with the result. If you have not heard from us within two working days, get in touch through the contact page.",
     another: "Send another registration",
     backToCourse: "Back to the course page",
   },

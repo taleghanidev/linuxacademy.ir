@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import FaqAccordion from "@/components/FaqAccordion";
 import PageShell, { useIsFa } from "@/components/PageShell";
-import { AI_AGENT_COURSE, lastSessionDate } from "@/config/courses";
+import { AI_AGENT_COURSE } from "@/config/courses";
 import aiAgentCourseEn from "@/language/en/pages/aiAgentCourse";
 import aiAgentCourseFa from "@/language/fa/pages/aiAgentCourse";
 import { formatCourseDate, formatMoney, formatRial, formatTomanEn } from "@/lib/format";
@@ -101,7 +101,6 @@ const AiAgentCourse = () => {
   const priceWas = isFa ? formatRial(course.priceOriginal) : formatTomanEn(course.priceOriginal);
 
   const startsOn = formatCourseDate(course.startDate, isFa);
-  const endsOn = formatCourseDate(lastSessionDate(course), isFa);
 
   const facts = [
     { icon: CalendarDays, label: lang.quickFacts.starts.label, value: startsOn },
@@ -138,9 +137,6 @@ const AiAgentCourse = () => {
               <p className="mb-6 inline-flex items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium text-gray-900 shadow-sm">
                 <CalendarDays className="h-4 w-4 text-brand-purple" />
                 {lang.quickFacts.starts.label}: {startsOn}
-                <span className="font-normal text-gray-400">
-                  {"\u2192"} {endsOn}
-                </span>
               </p>
               <div className="mb-6 flex flex-wrap items-center gap-4">
                 {cta("lg")}

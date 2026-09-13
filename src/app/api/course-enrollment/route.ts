@@ -18,14 +18,13 @@ const ACCEPTED = ["image/jpeg", "image/png", "image/webp", "image/heic", "applic
 const fieldsSchema = z.object({
   courseSlug: z.string().min(1, "unknown_course").max(100),
   fullName: z.string().trim().min(2, "name_too_short").max(120),
-  email: z.string().trim().toLowerCase().email("invalid_email").max(200),
-  // Iranian mobiles are 11 digits (09xxxxxxxxx); accept +98 and separators too.
+  email: z.string().trim().toLowerCase().email("invalid_email").max(200).or(z.literal("")),
+  // International format from the country-code picker: "+98 9123456789".
   phone: z
     .string()
     .trim()
-    .min(8, "invalid_phone")
-    .max(20)
-    .regex(/^[+\d][\d\s()-]{7,19}$/, "invalid_phone"),
+    .max(24)
+    .regex(/^\+\d{1,4} \d{6,14}$/, "invalid_phone"),
   note: z.string().trim().max(1000).optional().or(z.literal("")),
   // Which account they were shown; decides the currency and the amount owed.
   payRegion: z.enum(["iran", "international"]).catch("iran"),
