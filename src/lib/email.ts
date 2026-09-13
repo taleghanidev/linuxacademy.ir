@@ -163,7 +163,7 @@ function studentShell(heading: string, body: string): string {
     ${body}
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0" />
     <p style="font-size:12px;color:#9ca3af">لینوکس آکادمی · <a href="${site}" style="color:#7C3AED">linuxacademy.ir</a><br/>
-    برای هر پرسشی به همین ایمیل پاسخ دهید یا از صفحه تماس سایت اقدام کنید.</p>
+    این ایمیل یک‌طرفه است و به‌صورت خودکار ارسال شده؛ لطفاً به آن پاسخ ندهید.</p>
   </div>`;
 }
 
@@ -216,7 +216,7 @@ export async function sendEnrollmentEmail(
       `<p>${name} عزیز، سلام.</p>
        <p>متأسفانه نتوانستیم پرداخت شما برای دوره <b>${course}</b> را با رسید ارسالی تطبیق دهیم.</p>
        ${note}
-       <p>اگر فکر می‌کنید اشتباهی رخ داده، به همین ایمیل پاسخ دهید تا بررسی کنیم.</p>`,
+       <p>اگر فکر می‌کنید اشتباهی رخ داده، از صفحه تماس سایت با ما در ارتباط باشید تا بررسی کنیم.</p>`,
     ),
   );
 }
