@@ -19,8 +19,8 @@ import { cn } from "@/lib/utils";
 
 type Status = "idle" | "sending" | "done";
 
-// Country dialling codes for the phone field. Iran first, then the countries
-// most students write in from.
+// Suggested dialling codes for the phone field. Iran first, then the countries
+// most students write in from. Any other code can be typed in by hand.
 const DIAL_CODES = [
   { code: "+98", flag: "🇮🇷", name: "Iran" },
   { code: "+61", flag: "🇦🇺", name: "Australia" },
@@ -125,7 +125,7 @@ const CourseRegister = () => {
   const [fileName, setFileName] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const ids = { name: useId(), email: useId(), phone: useId(), note: useId(), file: useId() };
+  const ids = { name: useId(), email: useId(), phone: useId(), note: useId(), file: useId(), dial: useId() };
 
   const errorText = (code: string) =>
     (lang.errors as Record<string, string>)[code] ?? lang.errors.generic;
@@ -145,7 +145,12 @@ const CourseRegister = () => {
       setError(errorText("invalid_phone"));
       return;
     }
-    form.set("phone", `${dialCode} ${local}`);
+    const code = digitsOnly(dialCode);
+    if (code.length < 1 || code.length > 4) {
+      setError(errorText("invalid_phone"));
+      return;
+    }
+    form.set("phone", `+${code} ${local}`);
 
     // Check the file here too, so the common mistake never costs a round trip.
     const file = form.get("receipt");
@@ -378,18 +383,23 @@ const CourseRegister = () => {
                 {lang.form.phone}
               </label>
               <div className="flex gap-2" dir="ltr">
-                <select
+                {/* Free text with suggestions: any country code can be typed in. */}
+                <input
                   aria-label={lang.form.countryCode}
                   value={dialCode}
                   onChange={(e) => setDialCode(e.target.value)}
-                  className={cn(field, "w-28 shrink-0 px-2")}
-                >
+                  list={ids.dial}
+                  inputMode="tel"
+                  autoComplete="tel-country-code"
+                  className={cn(field, "w-24 shrink-0 px-2")}
+                />
+                <datalist id={ids.dial}>
                   {DIAL_CODES.map((c) => (
                     <option key={c.code} value={c.code}>
-                      {c.flag} {c.code}
+                      {c.flag} {c.name}
                     </option>
                   ))}
-                </select>
+                </datalist>
                 <input
                   id={ids.phone}
                   name="phone"
