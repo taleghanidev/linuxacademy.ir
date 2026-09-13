@@ -1,8 +1,10 @@
-// Owner email notifications via Resend. No-ops gracefully when RESEND_API_KEY
-// is unset. Failures never break the payment/scheduling flow.
+// Email via Resend: owner notifications and course emails to students.
+// No-ops gracefully when RESEND_API_KEY is unset. Failures never break the
+// payment/scheduling/registration flow.
 
 const API_KEY = process.env.RESEND_API_KEY;
-const FROM = process.env.RESEND_FROM || "Linux Academy <onboarding@resend.dev>";
+const FROM =
+  process.env.RESEND_FROM || "Linux Academy <notify@linuxacademy.ir>";
 
 function ownerEmail(): string | null {
   return (
@@ -12,20 +14,45 @@ function ownerEmail(): string | null {
   );
 }
 
-async function send(subject: string, html: string): Promise<void> {
-  const to = ownerEmail();
-  if (!API_KEY || !to) return;
+/** Sends one email. Resolves true when Resend accepted it. */
+async function deliver(
+  to: string,
+  subject: string,
+  html: string,
+): Promise<boolean> {
+  if (!API_KEY || !to) return false;
   try {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
-      headers: { Authorization: `Bearer ${API_KEY}`, "Content-Type": "application/json" },
+      headers: {
+        Authorization: `Bearer ${API_KEY}`,
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({ from: FROM, to: [to], subject, html }),
     });
-    if (!res.ok) console.error("Resend send failed:", (await res.text()).slice(0, 200));
+    if (!res.ok)
+      console.error("Resend send failed:", (await res.text()).slice(0, 200));
+    return res.ok;
   } catch (err) {
     console.error("Resend send error:", err);
+    return false;
   }
 }
+
+async function send(subject: string, html: string): Promise<void> {
+  const to = ownerEmail();
+  if (to) await deliver(to, subject, html);
+}
+
+/** Student-typed text goes into HTML, so escape it. */
+const esc = (v: string) =>
+  v.replace(
+    /[&<>"']/g,
+    (c) =>
+      ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[
+        c
+      ]!,
+  );
 
 const fmt = (n: number) => `${n.toLocaleString("en-US")} Toman`;
 
@@ -35,7 +62,12 @@ type OrderEmail = {
   discount: number;
   couponCode: string | null;
   customer: { name: string; email: string; phone: string };
-  items: Array<{ label: string; quantity: number; amount: number; type: string }>;
+  items: Array<{
+    label: string;
+    quantity: number;
+    amount: number;
+    type: string;
+  }>;
 };
 
 export async function notifyOrderPaid(o: OrderEmail): Promise<void> {
@@ -108,5 +140,83 @@ export async function notifyCourseEnrollment(e: {
        <a href="${e.receiptUrl}">View the payment receipt</a><br>
        Confirm or reject the seat in the admin area. Reference: ${e.id}
      </p>`,
+  );
+}
+
+/* ---------- Course emails to the student (Persian, right-to-left) ---------- */
+
+export type EnrollmentEmailKind = "received" | "confirmed" | "rejected";
+
+type StudentEmail = {
+  to: string;
+  fullName: string;
+  courseTitle: string;
+  startDate: string;
+  schedule: string;
+  reviewNote?: string | null;
+};
+
+function studentShell(heading: string, body: string): string {
+  const site = process.env.NEXT_PUBLIC_SITE_URL || "https://linuxacademy.ir";
+  return `<div dir="rtl" lang="fa" style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;line-height:1.9;color:#1f2937;text-align:right">
+    <h2 style="color:#7C3AED;margin-bottom:8px">${heading}</h2>
+    ${body}
+    <hr style="border:none;border-top:1px solid #eee;margin:24px 0" />
+    <p style="font-size:12px;color:#9ca3af">لینوکس آکادمی · <a href="${site}" style="color:#7C3AED">linuxacademy.ir</a><br/>
+    برای هر پرسشی به همین ایمیل پاسخ دهید یا از صفحه تماس سایت اقدام کنید.</p>
+  </div>`;
+}
+
+export async function sendEnrollmentEmail(
+  kind: EnrollmentEmailKind,
+  e: StudentEmail,
+): Promise<boolean> {
+  const name = esc(e.fullName);
+  const course = esc(e.courseTitle);
+  const note = e.reviewNote?.trim()
+    ? `<p style="background:#f9fafb;border-radius:8px;padding:10px 14px">${esc(e.reviewNote.trim())}</p>`
+    : "";
+
+  if (kind === "received") {
+    return deliver(
+      e.to,
+      `ثبت‌نام شما در «${e.courseTitle}» دریافت شد`,
+      studentShell(
+        "ثبت‌نام شما دریافت شد",
+        `<p>${name} عزیز، سلام.</p>
+         <p>فرم ثبت‌نام و رسید پرداخت شما برای دوره <b>${course}</b> به دست ما رسید. رسید را بررسی می‌کنیم و حداکثر ظرف دو روز کاری نتیجه را به شما اعلام می‌کنیم.</p>
+         <p>تا آن زمان کار دیگری لازم نیست.</p>`,
+      ),
+    );
+  }
+
+  if (kind === "confirmed") {
+    return deliver(
+      e.to,
+      `ثبت‌نام شما در «${e.courseTitle}» تأیید شد`,
+      studentShell(
+        "ثبت‌نام شما تأیید شد ✅",
+        `<p>${name} عزیز، سلام.</p>
+         <p>پرداخت شما بررسی و ثبت‌نامتان در دوره <b>${course}</b> قطعی شد. خوشحالیم که همراه ما هستید.</p>
+         <table style="border-collapse:collapse;margin:12px 0">
+           <tr><td style="padding:4px 0 4px 16px;color:#6b7280">شروع دوره</td><td style="padding:4px 0"><b>${esc(e.startDate)}</b></td></tr>
+           <tr><td style="padding:4px 0 4px 16px;color:#6b7280">زمان جلسات</td><td style="padding:4px 0"><b>${esc(e.schedule)}</b></td></tr>
+         </table>
+         ${note}
+         <p>لینک ورود به جلسات پیش از جلسه اول برایتان فرستاده می‌شود.</p>`,
+      ),
+    );
+  }
+
+  return deliver(
+    e.to,
+    `درباره ثبت‌نام شما در «${e.courseTitle}»`,
+    studentShell(
+      "ثبت‌نام شما تأیید نشد",
+      `<p>${name} عزیز، سلام.</p>
+       <p>متأسفانه نتوانستیم پرداخت شما برای دوره <b>${course}</b> را با رسید ارسالی تطبیق دهیم.</p>
+       ${note}
+       <p>اگر فکر می‌کنید اشتباهی رخ داده، به همین ایمیل پاسخ دهید تا بررسی کنیم.</p>`,
+    ),
   );
 }

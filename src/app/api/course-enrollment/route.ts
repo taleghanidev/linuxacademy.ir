@@ -3,6 +3,7 @@ import { z } from "zod";
 import { getCourse, type PayRegion } from "@/config/courses";
 import { courseEnrollments, db } from "@/db";
 import { notifyCourseEnrollment } from "@/lib/email";
+import { emailStudent } from "@/lib/enrollmentEmail";
 import { allowRequest, enrollmentLimiter } from "@/lib/ratelimit";
 
 // Registration for a course: the student transfers the fee to the bank account
@@ -134,6 +135,11 @@ export async function POST(request: Request) {
     currency,
     receiptUrl,
   }).catch((err) => console.error("Enrollment email failed:", err));
+
+  // Tell the student we have it, if they gave an email. Also best effort.
+  await emailStudent("received", { email, fullName, courseSlug, reviewNote: null }).catch((err) =>
+    console.error("Student receipt email failed:", err),
+  );
 
   return Response.json({ ok: true, id }, { status: 201 });
 }

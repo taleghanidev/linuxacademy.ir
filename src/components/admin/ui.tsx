@@ -109,6 +109,9 @@ const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-amber-100 text-amber-800 ring-amber-600/20",
   FAILED: "bg-red-100 text-red-700 ring-red-600/20",
   CANCELED: "bg-gray-100 text-gray-600 ring-gray-500/20",
+  PENDING_REVIEW: "bg-amber-100 text-amber-800 ring-amber-600/20",
+  CONFIRMED: "bg-green-100 text-green-800 ring-green-600/20",
+  REJECTED: "bg-red-100 text-red-700 ring-red-600/20",
 };
 
 export function StatusBadge({ status, label }: { status: string; label?: string }) {
