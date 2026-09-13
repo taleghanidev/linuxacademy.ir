@@ -157,8 +157,13 @@ type StudentEmail = {
 };
 
 function studentShell(heading: string, body: string): string {
-  const site = process.env.NEXT_PUBLIC_SITE_URL || "https://linuxacademy.ir";
+  // Absolute production URL: email clients cannot load localhost or relative paths.
+  const site = "https://linuxacademy.ir";
   return `<div dir="rtl" lang="fa" style="font-family:Tahoma,Arial,sans-serif;max-width:560px;margin:0 auto;line-height:1.9;color:#1f2937;text-align:right">
+    <div style="text-align:center;padding:8px 0 16px;border-bottom:1px solid #eee;margin-bottom:16px">
+      <a href="${site}"><img src="${site}/images/linuxlogo.png" width="48" height="55" alt="لینوکس آکادمی" style="display:inline-block;border:0" /></a>
+      <div style="font-weight:bold;color:#7C3AED;margin-top:6px">لینوکس آکادمی</div>
+    </div>
     <h2 style="color:#7C3AED;margin-bottom:8px">${heading}</h2>
     ${body}
     <hr style="border:none;border-top:1px solid #eee;margin:24px 0" />
