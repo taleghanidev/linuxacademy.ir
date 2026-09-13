@@ -3,8 +3,8 @@
 // payment/scheduling/registration flow.
 
 const API_KEY = process.env.RESEND_API_KEY;
-const FROM =
-  process.env.RESEND_FROM || "Linux Academy <notify@linuxacademy.ir>";
+// Hard-coded: linuxacademy.ir is the domain verified in Resend.
+const FROM = "Linux Academy <notify@linuxacademy.ir>";
 
 function ownerEmail(): string | null {
   return (
